@@ -171,12 +171,12 @@ export default class Drawer {
     this.isActive = false;
     this.drawer!.classList.remove('is-active');
     this.disclosure.setDisabled(true);
+    this.disclosure.resetAnime();
+    // this.drawer?.getAnimations().forEach((el) => {
+    //   console.log('getAnimations');
 
-    this.drawer?.getAnimations().forEach((el) => {
-      console.log('getAnimations');
-
-      el.cancel();
-    });
+    //   el.cancel();
+    // });
 
     // TODO: disclosureで、this.content.removeAttribute('aria-hidden'); しているが、メニューをsp、pcで使い回しているかどうかによって変わるかも。
   }

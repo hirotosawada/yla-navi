@@ -138,6 +138,20 @@ export default class Disclosure {
     }
   }
 
+  private removeStyles() {
+    // this.content.removeAttribute('style');
+    this.content.style.transform = '';
+    this.content.style.opacity = '';
+    this.content.style.height = '';
+  }
+
+  resetAnime() {
+    this.removeStyles();
+    this._animation?.commitStyles();
+    this._animation?.cancel();
+    this.removeStyles();
+  }
+
   // ========== ========== ========== ========== ==========
   // Public methods
   open(transition: string = this.options.transition || 'fade', duration: number = this.options.duration || 500): Promise<void> {
@@ -296,9 +310,11 @@ export default class Disclosure {
   setOptions(options: DisclosureOptions) {
     this.options = { ...this.options, ...options };
 
-    this.content.getAnimations().forEach((element) => {
-      element.cancel();
-    });
+    // this.content.getAnimations().forEach((element) => {
+    //   element.cancel();
+    // });
+
+    this.resetAnime();
 
     this.triggers.forEach((trigger) => {
       trigger.setOptions({
