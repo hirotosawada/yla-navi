@@ -1,12 +1,4 @@
-export interface TriggerOptions {
-  onClick?: (event: MouseEvent) => void;
-  onFocus?: (event: FocusEvent) => void;
-  onMouseEnter?: (event: MouseEvent) => void;
-
-  click?: boolean;
-  focus?: boolean;
-  enter?: boolean;
-}
+import { TriggerOptions } from './type';
 
 export default class Trigger {
   id: string;

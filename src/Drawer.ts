@@ -1,13 +1,5 @@
 import Disclosure from './Disclosure';
-
-type Options = {
-  selectorTrigger?: string;
-  selectorOverlay?: string;
-  selectorContent?: string;
-  breakpoint?: number | null;
-  transition?: string;
-  duration?: number;
-};
+import { DrawerOptions } from './type';
 
 export default class Drawer {
   // DOM
@@ -35,7 +27,7 @@ export default class Drawer {
   private mediaQuery: MediaQueryList | null = null;
 
   //オプション
-  private optionsDefaut: Required<Options> = {
+  private optionsDefaut: Required<DrawerOptions> = {
     selectorTrigger: '.drawer__trigger',
     selectorOverlay: '.drawer__overlay',
     selectorContent: '.drawer__content',
@@ -44,9 +36,9 @@ export default class Drawer {
     transition: '',
     duration: 600,
   };
-  private options: Required<Options>;
+  private options: Required<DrawerOptions>;
 
-  constructor(container: HTMLElement | null, options?: Options) {
+  constructor(container: HTMLElement | null, options?: DrawerOptions) {
     this.options = Object.assign({}, this.optionsDefaut, options);
 
     this.drawer = container;

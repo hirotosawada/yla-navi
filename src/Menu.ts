@@ -1,22 +1,9 @@
 // メガメニュー
 // アコーディオン（folding）
 // ページ
+import Disclosure from './Disclosure';
 // ドロップダウン
-
-import Disclosure, { DisclosureOptions } from './Disclosure';
-
-interface MenuItemOptions extends DisclosureOptions {
-  item?: string;
-  term?: string;
-  child?: string;
-
-  isCloseChildren?: boolean;
-  isCloseSiblings?: boolean;
-}
-
-interface MenuOptions extends MenuItemOptions {
-  type?: string;
-}
+import { DisclosureOptions, MenuItemOptions, MenuOptions } from './type';
 
 export default class Menu {
   container: HTMLElement;

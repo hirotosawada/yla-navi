@@ -3,20 +3,7 @@ import {
  SlideRightTransition, SlideTopTransition, Transition
 } from './Transition';
 import Trigger from './Trigger';
-
-// import type TriggerOptions from './Trigger';
-
-export interface DisclosureOptions {
-  click?: boolean;
-  focus?: boolean;
-  enter?: boolean;
-  leave?: boolean;
-  onOpen?: () => void;
-  onClose?: () => Promise<void> | void;
-
-  transition?: string;
-  duration?: number;
-}
+import { DisclosureOptions } from './type';
 
 export default class Disclosure {
   id: string;
