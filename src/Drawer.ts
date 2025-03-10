@@ -253,12 +253,20 @@ export default class Drawer {
 
       if (event.key === 'Tab') {
         if (event.shiftKey) {
-          if (document.activeElement === focusableFirst) {
+          // Tab + Shift
+          if (document.activeElement && !Array.from(this.focusable).includes(document.activeElement as HTMLElement)) {
+            event.preventDefault();
+            focusableLast?.focus();
+          } else if (document.activeElement === focusableFirst) {
             event.preventDefault();
             focusableLast?.focus();
           }
         } else {
-          if (document.activeElement === focusableLast) {
+          // Tab
+          if (document.activeElement && !Array.from(this.focusable).includes(document.activeElement as HTMLElement)) {
+            event.preventDefault();
+            focusableFirst?.focus();
+          } else if (document.activeElement === focusableLast) {
             event.preventDefault();
             focusableFirst?.focus();
           }
