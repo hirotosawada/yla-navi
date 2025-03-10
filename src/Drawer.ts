@@ -273,18 +273,12 @@ export default class Drawer {
     return this.disclosure.isOpen;
   }
 
-  open() {
-    if (!this.isOpen) {
-      this.disclosure.open().then(() => {
-        console.log('o-p-e-n');
-      });
-    }
+  open(transition?: string) {
+    this.disclosure.open(transition);
   }
 
-  close() {
-    if (this.isOpen) {
-      this.disclosure.close().then(() => {});
-    }
+  close(transition?: string) {
+    this.disclosure.close(transition);
   }
 
   on(event: string, callback: (event: Event) => void) {

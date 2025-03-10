@@ -34,6 +34,7 @@ export default class Menu {
     folding: { top: 'folding', under: 'folding' },
     dropdown: { top: 'fade', under: 'fade' },
     mega: { top: 'slideRight', under: 'folding' },
+    none: { top: 'none', under: 'none' },
   };
 
   private handleOnLeave: () => void;
@@ -109,9 +110,9 @@ export default class Menu {
     });
   }
 
-  close() {
+  close(transition?: string) {
     this.menuItems.forEach((item) => {
-      item.close();
+      item.close(transition);
     });
   }
 }
@@ -194,7 +195,7 @@ class MenuItem extends Disclosure {
     });
   }
 
-  closeSiblings(transition: string) {
+  closeSiblings(transition?: string) {
     this.siblings.forEach((item) => {
       item.close(transition);
     });

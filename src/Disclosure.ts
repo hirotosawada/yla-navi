@@ -1,7 +1,4 @@
-import {
- FadeTransition, FoldingTransition, SlideBottomTransition, SlideLeftTransition,
- SlideRightTransition, SlideTopTransition, Transition
-} from './Transition';
+import { FadeTransition, FoldingTransition, SlideBottomTransition, SlideLeftTransition, SlideRightTransition, SlideTopTransition, Transition } from './Transition';
 import Trigger from './Trigger';
 import { DisclosureOptions } from './type';
 
@@ -96,8 +93,7 @@ export default class Disclosure {
 
   private initTrigger(trigger: HTMLElement): Trigger {
     const callbacks = {
-      onClick: (event: MouseEvent) => {
-        event.preventDefault();
+      onClick: () => {
         this.toggle();
       },
       onFocus: () => {
@@ -128,9 +124,8 @@ export default class Disclosure {
       case 'slideRight':
         return new SlideRightTransition(this.content);
       case 'none':
-        return null;
       default:
-        return new FadeTransition(this.content);
+        return null;
     }
   }
 
@@ -141,11 +136,16 @@ export default class Disclosure {
     this.content.style.height = '';
   }
 
-  resetAnime() {
+  resetAnime(isKeepStyle: boolean = false) {
+    // console.log('reset anime', isKeepStyle);
+
     this.removeStyles();
     this._animation?.commitStyles();
     this._animation?.cancel();
-    this.removeStyles();
+
+    if (!isKeepStyle) {
+      this.removeStyles();
+    }
   }
 
   // ========== ========== ========== ========== ==========
@@ -182,11 +182,12 @@ export default class Disclosure {
           trigger.setExpanded(true);
         });
 
-        const transitionInstance = this.createTransitionInstance(this.options.transition ?? 'none');
+        const transitionInstance = this.createTransitionInstance(transition);
         if (transitionInstance) {
           const keyframes = transitionInstance.getKeyframesOpen();
 
           transitionInstance.beforeOpen();
+          this._animation?.cancel();
           this._animation = this.content!.animate(keyframes, { duration: duration, easing: 'ease-in-out', fill: 'forwards' });
           this._animation.finished
             .then(() => {
@@ -194,6 +195,7 @@ export default class Disclosure {
               transitionInstance.afterOpen();
               this._isOpening = false;
               handleOpen();
+              this.resetAnime();
               resolve();
             })
             .catch(() => {
@@ -202,6 +204,7 @@ export default class Disclosure {
               resolve();
             });
         } else {
+          this._animation?.cancel();
           handleOpen();
           resolve();
         }
@@ -231,9 +234,6 @@ export default class Disclosure {
       const handleClose = () => {
         this._isOpen = false;
         this.content.setAttribute('aria-hidden', 'true');
-        this.triggers.forEach((trigger) => {
-          trigger.setExpanded(false);
-        });
 
         this._isAnimating = false;
         this.triggers.forEach((trigger) => {
@@ -246,11 +246,16 @@ export default class Disclosure {
       return new Promise<void>((resolve) => {
         this.options.onClose?.();
 
-        const transitionInstance = this.createTransitionInstance(this.options.transition ?? 'none');
+        this.triggers.forEach((trigger) => {
+          trigger.setExpanded(false);
+        });
+
+        const transitionInstance = this.createTransitionInstance(transition);
         if (transitionInstance) {
           const keyframes = transitionInstance.getKeyframesClose();
 
           transitionInstance.beforeClose();
+          this._animation?.cancel();
           this._animation = this.content!.animate(keyframes, { duration: duration, easing: 'ease-in-out', fill: 'forwards' });
           this._animation.finished
             .then(() => {
@@ -259,6 +264,8 @@ export default class Disclosure {
               this._isClosing = false;
 
               handleClose();
+              this.resetAnime();
+
               resolve();
             })
             .catch(() => {
@@ -267,7 +274,9 @@ export default class Disclosure {
               resolve();
             });
         } else {
+          this._animation?.cancel();
           handleClose();
+          resolve();
         }
       });
     }
@@ -304,11 +313,7 @@ export default class Disclosure {
   setOptions(options: DisclosureOptions) {
     this.options = { ...this.options, ...options };
 
-    // this.content.getAnimations().forEach((element) => {
-    //   element.cancel();
-    // });
-
-    this.resetAnime();
+    // this.resetAnime();
 
     this.triggers.forEach((trigger) => {
       trigger.setOptions({

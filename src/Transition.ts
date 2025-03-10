@@ -180,7 +180,7 @@ export class SlideBottomTransition extends Transition {
 
     const translateY = this.decomposeMatrix(currentStyle.transform).translateY;
     if (translateY && translateY > 0) {
-      keyframe = { translateY: `${translateY}px` };
+      keyframe = { transform: `translatYX(${translateY}px)` };
     }
 
     return [keyframe, this.keyFrameDefault.open];
@@ -192,7 +192,7 @@ export class SlideBottomTransition extends Transition {
 
     const translateY = this.decomposeMatrix(currentStyle.transform).translateY;
     if (translateY && translateY > 0) {
-      keyframe = { translateY: `${translateY}px` };
+      keyframe = { transform: `translatYX(${translateY}px)` };
     }
 
     return [keyframe, this.keyFrameDefault.close];
@@ -207,7 +207,7 @@ export class SlideLeftTransition extends Transition {
 
     const translateX = this.decomposeMatrix(currentStyle.transform).translateX;
     if (translateX && translateX < 0) {
-      keyframe = { translateY: `${translateX}px` };
+      keyframe = { transform: `translateX(${translateX}px)` };
     }
 
     return [keyframe, this.keyFrameDefault.open];
@@ -219,7 +219,7 @@ export class SlideLeftTransition extends Transition {
 
     const translateX = this.decomposeMatrix(currentStyle.transform).translateX;
     if (translateX && translateX < 0) {
-      keyframe = { translateY: `${translateX}px` };
+      keyframe = { transform: `translateX(${translateX}px)` };
     }
 
     return [keyframe, this.keyFrameDefault.close];
@@ -234,7 +234,7 @@ export class SlideRightTransition extends Transition {
 
     const translateX = this.decomposeMatrix(currentStyle.transform).translateX;
     if (translateX && translateX > 0) {
-      keyframe = { translateY: `${translateX}px` };
+      keyframe = { transform: `translateX(${translateX}px)` };
     }
 
     return [keyframe, this.keyFrameDefault.open];
@@ -246,7 +246,7 @@ export class SlideRightTransition extends Transition {
 
     const translateX = this.decomposeMatrix(currentStyle.transform).translateX;
     if (translateX && translateX > 0) {
-      keyframe = { translateY: `${translateX}px` };
+      keyframe = { transform: `translateX(${translateX}px)` };
     }
 
     return [keyframe, this.keyFrameDefault.close];
