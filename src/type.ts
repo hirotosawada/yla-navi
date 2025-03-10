@@ -25,7 +25,7 @@ export interface MenuItemOptions extends DisclosureOptions {
   term?: string;
   child?: string;
 
-  isCloseChildren?: boolean;
+  isCloseChildren?: boolean; // 子を閉じないとかありえる？
   isCloseSiblings?: boolean;
 }
 
