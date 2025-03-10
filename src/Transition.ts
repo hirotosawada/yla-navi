@@ -115,7 +115,7 @@ export class FoldingTransition extends Transition {
     // if (parseInt(currentStyle.height) > 0) {
     // }
 
-    console.log(currentStyle.height);
+    // console.log(currentStyle.height);
 
     return [keyframe, this.keyFrameDefault.close];
     // return [];
@@ -154,7 +154,7 @@ export class SlideTopTransition extends Transition {
       keyframe = { translateY: `${translateY}px` };
     }
 
-    console.log(this.decomposeMatrix(currentStyle.transform));
+    // console.log(this.decomposeMatrix(currentStyle.transform));
 
     return [keyframe, this.keyFrameDefault.open];
   }

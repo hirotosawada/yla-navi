@@ -82,7 +82,7 @@ export default class Menu {
       if (!this.options.leave) {
         return;
       }
-      console.log('menu: mouseleave');
+      // console.log('menu: mouseleave');
 
       this.menuItems.forEach((item) => {
         item.close();
@@ -95,7 +95,7 @@ export default class Menu {
   setOptions(options: MenuOptions) {
     this.options = { ...this.options, ...options };
 
-    console.log('menu: setoptions', options);
+    // console.log('menu: setoptions', options);
 
     this.menuItems.forEach((item) => {
       let transition;
@@ -135,7 +135,7 @@ class MenuItem extends Disclosure {
 
     super(content, triggers, { ...options, leave: false });
 
-    console.log(options, '/', options.leave);
+    // console.log(options, '/', options.leave);
 
     this.leave = options.leave ?? true;
 
@@ -155,7 +155,7 @@ class MenuItem extends Disclosure {
   }
 
   private onLeaveContainer() {
-    console.log('menuitem: mouseleave', this.leave);
+    // console.log('menuitem: mouseleave', this.leave);
     if (!this.leave) {
       return;
     }
@@ -191,7 +191,7 @@ class MenuItem extends Disclosure {
   }
 
   setOptions(options: MenuItemOptions | DisclosureOptions) {
-    console.log(options);
+    // console.log(options);
     super.setOptions({ ...options, leave: false });
 
     if ('isCloseChildren' in options && options.isCloseChildren !== undefined) {
@@ -205,7 +205,5 @@ class MenuItem extends Disclosure {
     if ('leave' in options && options.leave !== undefined) {
       this.leave = options.leave ?? this.leave;
     }
-
-    console.log(this.isCloseSiblings);
   }
 }

@@ -13,12 +13,12 @@ export default class Trigger {
   handleOnMouseEnter: (event: MouseEvent) => void;
 
   handleOnMouseDown = () => {
-    console.log('trigger: mousedown');
+    // console.log('trigger: mousedown');
     this.isMouseDown = true;
   };
 
   handleOnMouseUp = () => {
-    console.log('trigger: mouseup');
+    // console.log('trigger: mouseup');
     this.isMouseDown = false;
   };
 
@@ -61,8 +61,7 @@ export default class Trigger {
 
       return;
     }
-
-    console.log('trigger: click');
+    // console.log('trigger: click');
 
     this.options.onClick?.(event);
   }
@@ -72,7 +71,7 @@ export default class Trigger {
       // マウスからのフォーカスは無視
       return;
     }
-    console.log('trigger: focus');
+    // console.log('trigger: focus');
 
     this.options.onFocus?.(event);
   }
@@ -81,7 +80,7 @@ export default class Trigger {
     if (this.isDisabled || !this.options.enter) {
       return;
     }
-    console.log('trigger: mouseenter');
+    // console.log('trigger: mouseenter', this.options.enter);
 
     this.options.onMouseEnter?.(event);
   }

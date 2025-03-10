@@ -130,11 +130,11 @@ export default class Drawer {
 
   private changeMediaQuery(event: MediaQueryListEvent) {
     if (event.matches) {
-      console.log(`Viewport <= ${this.options.breakpoint}px`);
+      // console.log(`Viewport <= ${this.options.breakpoint}px`);
 
       this.activate();
     } else {
-      console.log(`Viewport > ${this.options.breakpoint}px`);
+      // console.log(`Viewport > ${this.options.breakpoint}px`);
 
       if (this.isOpen) {
         this.disclosure.close('none').then(() => {
@@ -151,15 +151,14 @@ export default class Drawer {
   // ---------- ----------
 
   private activate() {
-    console.log('drawer: activate');
+    // console.log('drawer: activate');
     this.isActive = true;
     this.drawer!.classList.add('is-active');
     this.disclosure.setDisabled(false);
   }
 
   private deactivate() {
-    console.log('drawer: deactivate');
-    this.close();
+    // console.log('drawer: deactivate');
     this.isActive = false;
     this.drawer!.classList.remove('is-active');
     this.disclosure.setDisabled(true);
@@ -183,7 +182,7 @@ export default class Drawer {
   };
 
   private onOpen() {
-    console.log('drawer: onOpen');
+    // console.log('drawer: onOpen');
 
     this.scrollLock();
     document.addEventListener('keydown', this.handleFocusTrap);
@@ -218,7 +217,7 @@ export default class Drawer {
     if (animations) {
       return new Promise<void>((resolve) => {
         Promise.all(animations).then(() => {
-          console.log('animations end overlay');
+          // console.log('animations end overlay');
           this.overlay ? (this.overlay.style.display = 'none') : null;
           resolve();
         });
