@@ -12,6 +12,7 @@ export default class Disclosure {
 
   // コールバック
   protected handleOnLeave: (event: MouseEvent) => void;
+  protected handleOnFocusout: (event: FocusEvent) => void;
 
   // ステータス
   private _isOpen: boolean = false;
@@ -62,6 +63,8 @@ export default class Disclosure {
 
     this.handleOnLeave = this.onLeave.bind(this);
     this.content.addEventListener('mouseleave', this.handleOnLeave);
+    this.handleOnFocusout = this.onFocusout.bind(this);
+    this.content.addEventListener('focusout', this.handleOnFocusout);
 
     // ---------- ---------- ---------- ---------- ----------
     // triggersの初期化
@@ -83,6 +86,12 @@ export default class Disclosure {
     }
 
     this.close();
+  }
+
+  private onFocusout(ev: FocusEvent) {
+    if (ev.relatedTarget && !this.content.contains(ev.relatedTarget as Node)) {
+      // console.log('フォーカスが container の外へ出ました');
+    }
   }
 
   private initTrigger(trigger: HTMLElement): Trigger {

@@ -127,6 +127,7 @@ class MenuItem extends Disclosure {
   leave: boolean = true;
 
   private handleOnLeaveContainer: (event: MouseEvent) => void;
+  protected handleOnFocusoutContainer: (event: FocusEvent) => void;
 
   constructor(container: HTMLElement | null, content: HTMLElement | null, triggers: HTMLElement | HTMLElement[] | NodeListOf<HTMLElement> | null, options: MenuItemOptions = {}) {
     if (!container) {
@@ -148,10 +149,13 @@ class MenuItem extends Disclosure {
     }
 
     this.handleOnLeaveContainer = this.onLeaveContainer.bind(this);
+    this.handleOnFocusoutContainer = this.onFocusoutContainer.bind(this);
     this.container = container;
     this.container.addEventListener('mouseleave', this.handleOnLeaveContainer);
+    this.container.addEventListener('focusout', this.handleOnFocusoutContainer);
 
     this.content.removeEventListener('mouseleave', this.handleOnLeave);
+    this.content.removeEventListener('focusout', this.handleOnFocusout);
   }
 
   private onLeaveContainer() {
@@ -163,8 +167,14 @@ class MenuItem extends Disclosure {
     this.close();
   }
 
-  open(transition: string) {
-    console.log('isCloseSiblings', this.isCloseSiblings);
+  private onFocusoutContainer(ev: FocusEvent) {
+    if (ev.relatedTarget && !this.content.contains(ev.relatedTarget as Node)) {
+      this.close();
+    }
+  }
+
+  open(transition?: string) {
+    // console.log('isCloseSiblings', this.isCloseSiblings);
     if (this.isCloseSiblings) {
       this.closeSiblings(transition);
     }
