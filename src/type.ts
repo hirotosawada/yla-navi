@@ -40,4 +40,57 @@ export interface DrawerOptions {
   breakpoint?: number | null;
   transition?: string;
   duration?: number;
+  scroll?: number;
+}
+
+// ========== ========== ========== ========== ==========
+export interface DrawerOptions2 {
+  content?: string;
+  overlay?: string;
+  trigger?: string;
+
+  transition?: string;
+  duration?: number;
+
+  breakpoint?: number | null;
+}
+
+export interface DisclosureOptions2 {
+  onOpen?: () => void;
+  onClose?: () => Promise<void> | void;
+
+  transition?: string;
+  duration?: number;
+
+  isOpen?: {
+    click?: boolean;
+    focus?: boolean;
+    enter?: boolean;
+  };
+
+  isClose?: {
+    click?: boolean;
+    leave?: boolean;
+  };
+}
+
+export interface TriggerOptions2 {
+  onClick?: (event: MouseEvent) => void;
+  onFocus?: (event: FocusEvent) => void;
+  onMouseEnter?: (event: MouseEvent) => void;
+
+  isOpen?: {
+    click?: boolean;
+    focus?: boolean;
+    enter?: boolean;
+  };
+}
+
+export interface MenuItemOptions2 extends DisclosureOptions2 {
+  item?: string;
+  term?: string;
+  child?: string;
+
+  isCloseChildren?: boolean; // 子を閉じないとかありえる？
+  isCloseSiblings?: boolean;
 }

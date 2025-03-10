@@ -19,6 +19,7 @@ export default class Drawer {
   private handleClickAnchor: (event: MouseEvent) => void = () => {};
   private handleKeydownEsc: (event: KeyboardEvent) => void = () => {};
   private handleChangeMediaQuery: (event: MediaQueryListEvent) => any = () => {};
+  private handleScrolled: () => void = () => {};
 
   // ステータス
   private isInit: boolean = false;
@@ -35,6 +36,7 @@ export default class Drawer {
 
     transition: '',
     duration: 600,
+    scroll: 200,
   };
   private options: Required<DrawerOptions>;
 
@@ -72,6 +74,8 @@ export default class Drawer {
     this.handleKeydownEsc = this.keydownEsc.bind(this);
 
     this.handleChangeMediaQuery = this.changeMediaQuery.bind(this);
+
+    this.handleScrolled = this.scrolled.bind(this);
   }
 
   private addEvents() {
@@ -89,6 +93,8 @@ export default class Drawer {
     } else {
       this.activate();
     }
+
+    window.addEventListener('scroll', this.handleScrolled);
   }
 
   private removeEvents() {
@@ -140,6 +146,16 @@ export default class Drawer {
     }
 
     this.drawer!.dispatchEvent(new CustomEvent('drawer:changeMediaQuery', { detail: { event } }));
+  }
+
+  private scrolled() {
+    const scrollThreshold = this.options.scroll;
+
+    if (window.scrollY > scrollThreshold) {
+      document.documentElement.classList.add('is-scrolled');
+    } else {
+      document.documentElement.classList.remove('is-scrolled');
+    }
   }
 
   // ---------- ----------
