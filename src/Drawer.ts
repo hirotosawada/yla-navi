@@ -231,6 +231,7 @@ export default class Drawer {
   private scrollLock() {
     // スクロール位置固定
     this.currentScrollY = window.scrollY;
+    document.body.style.width = getComputedStyle(document.body).width;
     document.body.style.top = `-${this.currentScrollY}px`;
     document.body.classList.add('is-scrolllocked');
   }
@@ -238,9 +239,10 @@ export default class Drawer {
   private scrollUnlock() {
     // スクロール位置復元
     document.body.style.top = '';
+    document.body.style.width = '';
     document.body.classList.remove('is-scrolllocked');
 
-    window.scrollTo(0, this.currentScrollY * -1);
+    window.scrollTo({ top: this.currentScrollY, behavior: 'instant' });
   }
 
   private focusTrap(event: KeyboardEvent) {
