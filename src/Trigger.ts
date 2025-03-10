@@ -56,9 +56,12 @@ export default class Trigger {
 
   // ========== ========== ========== ========== ==========
   private onClick(event: MouseEvent) {
-    if (this.isDisabled || !this.options.click) {
-      console.log('no click');
+    if (this.options.click) {
+      // triggerが aタグだった時にクリック時の遷移を防ぐ
+      event.preventDefault();
+    }
 
+    if (this.isDisabled || !this.options.click) {
       return;
     }
     // console.log('trigger: click');

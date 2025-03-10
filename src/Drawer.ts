@@ -42,6 +42,7 @@ export default class Drawer {
     this.options = Object.assign({}, this.optionsDefaut, options);
 
     this.drawer = container;
+    this.drawer?.classList.add('is-init');
     this.overlay = document.querySelector<HTMLElement>(this.options.selectorOverlay);
     this.overlay ? (this.overlay.style.display = 'none') : null;
 
@@ -54,12 +55,7 @@ export default class Drawer {
       throw new Error('Drawer: Not found element');
     }
 
-    this.disclosure = new Disclosure(this.drawer, this.trigger, {
-      onOpen: this.onOpen.bind(this),
-      onClose: this.onClose.bind(this),
-      transition: this.options.transition,
-      // transition: 'none',
-    });
+    this.disclosure = new Disclosure(this.drawer, this.trigger, { onOpen: this.onOpen.bind(this), onClose: this.onClose.bind(this), transition: this.options.transition, duration: this.options.duration });
 
     this.anchors = this.drawer!.querySelectorAll<HTMLAnchorElement>('a[href^="#"]');
     this.focusable = this.drawer!.querySelectorAll<HTMLElement>('a, button, input, textarea, select, [tabindex]:not([tabindex="-1"])');
@@ -89,10 +85,7 @@ export default class Drawer {
     if (this.options.breakpoint) {
       this.mediaQuery = window.matchMedia(`(max-width: ${this.options.breakpoint}px)`);
       this.mediaQuery.addEventListener('change', this.handleChangeMediaQuery);
-      this.changeMediaQuery({
-        matches: this.mediaQuery.matches,
-        media: this.mediaQuery.media,
-      } as MediaQueryListEvent);
+      this.changeMediaQuery({ matches: this.mediaQuery.matches, media: this.mediaQuery.media } as MediaQueryListEvent);
     } else {
       this.activate();
     }
@@ -129,6 +122,7 @@ export default class Drawer {
   }
 
   private changeMediaQuery(event: MediaQueryListEvent) {
+    this.close('none');
     if (event.matches) {
       // console.log(`Viewport <= ${this.options.breakpoint}px`);
 
@@ -173,13 +167,7 @@ export default class Drawer {
   }
 
   // ---------- ----------
-  anime: { [key: string]: Keyframe[] } = {
-    fade: [{ opacity: '0' }, { opacity: '1' }],
-    top: [{ transform: 'translateY(-100%)' }, { transform: 'translateY(0%)' }],
-    right: [{ transform: 'translateX(100%)' }, { transform: 'translateX(0%)' }],
-    bottom: [{ transform: 'translateY(100%)' }, { transform: 'translateY(0%)' }],
-    left: [{ transform: 'translateX(-100%)' }, { transform: 'translateX(0%)' }],
-  };
+  anime: { [key: string]: Keyframe[] } = { fade: [{ opacity: '0' }, { opacity: '1' }], top: [{ transform: 'translateY(-100%)' }, { transform: 'translateY(0%)' }], right: [{ transform: 'translateX(100%)' }, { transform: 'translateX(0%)' }], bottom: [{ transform: 'translateY(100%)' }, { transform: 'translateY(0%)' }], left: [{ transform: 'translateX(-100%)' }, { transform: 'translateX(0%)' }] };
 
   private onOpen() {
     // console.log('drawer: onOpen');
@@ -199,7 +187,7 @@ export default class Drawer {
 
   private onClose(): Promise<void> {
     // Promiseで、アニメーション後に Disclosure を閉じる
-    console.log('drawer: onClose');
+    // console.log('drawer: onClose');
 
     document.removeEventListener('keydown', this.handleFocusTrap);
     (document.activeElement as HTMLElement)?.blur();
