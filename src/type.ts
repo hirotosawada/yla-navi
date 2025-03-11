@@ -40,7 +40,11 @@ export interface DrawerOptions {
   breakpoint?: number | null;
   transition?: string;
   duration?: number;
-  scroll?: number;
+  scroll?: {
+    over?: number;
+    up?: number;
+    down?: number;
+  };
 }
 
 // ========== ========== ========== ========== ==========

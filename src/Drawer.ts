@@ -19,13 +19,20 @@ export default class Drawer {
   private handleClickAnchor: (event: MouseEvent) => void = () => {};
   private handleKeydownEsc: (event: KeyboardEvent) => void = () => {};
   private handleChangeMediaQuery: (event: MediaQueryListEvent) => any = () => {};
-  private handleScrolled: () => void = () => {};
+  private handleOnScroll: () => void = () => {};
 
   // ステータス
   private isInit: boolean = false;
   private isActive: boolean = false;
   private currentScrollY: number = 0;
   private mediaQuery: MediaQueryList | null = null;
+
+  // 他
+  private scrollBuffer: number = 0;
+  private scrollLast: number = 0;
+  private scrollTicking: boolean = false; // 余計な処理を抑制するフラグ
+  private scrollDirection: number = 1; // up: 1, down: -1
+  private scrollEventFired: boolean = false;
 
   //オプション
   private optionsDefaut: Required<DrawerOptions> = {
@@ -36,7 +43,7 @@ export default class Drawer {
 
     transition: '',
     duration: 600,
-    scroll: 200,
+    scroll: { over: 200, up: 0, down: 0 },
   };
   private options: Required<DrawerOptions>;
 
@@ -75,7 +82,7 @@ export default class Drawer {
 
     this.handleChangeMediaQuery = this.changeMediaQuery.bind(this);
 
-    this.handleScrolled = this.scrolled.bind(this);
+    this.handleOnScroll = this.onScroll.bind(this);
   }
 
   private addEvents() {
@@ -94,7 +101,7 @@ export default class Drawer {
       this.activate();
     }
 
-    window.addEventListener('scroll', this.handleScrolled);
+    window.addEventListener('scroll', this.handleOnScroll);
   }
 
   private removeEvents() {
@@ -106,6 +113,8 @@ export default class Drawer {
     document.removeEventListener('keydown', this.handleKeydownEsc);
 
     document.removeEventListener('keydown', this.handleFocusTrap);
+
+    window.removeEventListener('scroll', this.handleOnScroll);
   }
 
   private clickOverlay() {
@@ -148,13 +157,50 @@ export default class Drawer {
     this.drawer!.dispatchEvent(new CustomEvent('drawer:changeMediaQuery', { detail: { event } }));
   }
 
-  private scrolled() {
-    const scrollThreshold = this.options.scroll;
+  private onScroll() {
+    if (!this.scrollTicking) {
+      requestAnimationFrame(() => {
+        const currentScrollY = window.scrollY;
 
-    if (window.scrollY > scrollThreshold) {
-      document.documentElement.classList.add('is-scrolled');
-    } else {
-      document.documentElement.classList.remove('is-scrolled');
+        // スクロール方向切り替え
+        if (currentScrollY > this.scrollLast && this.scrollDirection < 0) {
+          // 上スクロールから下スクロールへ切り替え
+          this.scrollDirection = 1;
+          this.scrollBuffer = 0;
+          this.scrollEventFired = false;
+        } else if (currentScrollY < this.scrollLast && this.scrollDirection > 0) {
+          // 下スクロールから上スクロールへ切り替え
+          this.scrollDirection = -1;
+          this.scrollBuffer = 0;
+          this.scrollEventFired = false;
+        }
+
+        // パラメータ更新
+        this.scrollBuffer += currentScrollY - this.scrollLast;
+        this.scrollLast = currentScrollY;
+
+        // スクロールのステータスをクラスに反映
+        document.documentElement.classList.toggle('is-scrolled', currentScrollY > (this.options.scroll.over || 0));
+        document.documentElement.classList.toggle('is-scrolling-down', this.scrollBuffer > 0);
+        document.documentElement.classList.toggle('is-scrolling-up', this.scrollBuffer < 0);
+
+        // イベント発火
+        if (!this.scrollEventFired) {
+          if (this.scrollBuffer > (this.options.scroll.down || 0)) {
+            console.log('is-scrolled-down');
+            this.drawer?.dispatchEvent(new CustomEvent('drawer:scrolldown'));
+            this.scrollEventFired = true;
+          } else if (this.scrollBuffer < -(this.options.scroll.up || 0)) {
+            console.log('is-scrolled-up');
+            this.drawer?.dispatchEvent(new CustomEvent('drawer:scrollup'));
+            this.scrollEventFired = true;
+          }
+        }
+
+        this.scrollTicking = false;
+      });
+
+      this.scrollTicking = true;
     }
   }
 
@@ -295,18 +341,18 @@ export default class Drawer {
     this.disclosure.close(transition);
   }
 
-  on(event: string, callback: (event: Event) => void) {
-    if (event === 'drawer:anchor' || event === 'drawer:changeMediaQuery') {
-      this.drawer!.addEventListener(event, (ev: Event) => {
+  on(eventName: string, callback: (event: Event) => void) {
+    if (eventName === 'drawer:anchor') {
+      this.drawer!.addEventListener(eventName, (ev: Event) => {
         const customEvent = ev as CustomEvent;
         callback(customEvent.detail.event);
       });
-    } else if (event === 'drawer:changeMediaQuery') {
-      this.drawer!.addEventListener(event, (ev: Event) => {
+    } else if (eventName === 'drawer:changeMediaQuery') {
+      this.drawer!.addEventListener(eventName, (ev: Event) => {
         callback(ev as MediaQueryListEvent);
       });
     } else {
-      this.drawer!.addEventListener(event, callback);
+      this.drawer!.addEventListener(eventName, callback);
     }
   }
 
