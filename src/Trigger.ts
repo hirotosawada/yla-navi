@@ -49,8 +49,8 @@ export default class Trigger {
       this.trigger.addEventListener('focus', this.handleOnFocus);
     }
 
-    this.trigger.addEventListener('mouseenter', this.handleOnMouseEnter);
     if (this.options.onMouseEnter) {
+      this.trigger.addEventListener('mouseenter', this.handleOnMouseEnter);
     }
   }
 

@@ -10,14 +10,14 @@ export default class Menu {
   menuItems: MenuItem[] = [];
 
   options: Required<MenuOptions> = {
-    type: 'folding',
+    type: 'folding', // メニューの種類
 
     // MenuItemOptions
-    item: '.menu__item',
-    term: '.menu__term',
-    child: '.menu__child',
-    isCloseChildren: true,
-    isCloseSiblings: true,
+    item: '.menu__item', // アイテム
+    term: '.menu__term', // トリガー
+    child: '.menu__child', // コンテンツ
+    isCloseChildren: true, // 子も一緒に閉じるか
+    isCloseSiblings: true, // 兄弟も一緒に閉じるか
 
     // DisclosureOptions
     click: false,
@@ -26,14 +26,18 @@ export default class Menu {
     leave: true, // contentのleaveでなく、containerのleaveとして使う
     onOpen: () => {},
     onClose: () => {},
-    transition: 'folding',
     duration: 400,
   };
 
   private settings: { [key: string]: { top: string; under: string } } = {
     folding: { top: 'folding', under: 'folding' },
-    dropdown: { top: 'fade', under: 'fade' },
-    mega: { top: 'slideRight', under: 'folding' },
+    dropdown: { top: 'folding', under: 'folding' },
+    slideRight: { top: 'slideRight', under: 'slideRight' },
+    slideLeft: { top: 'slideLeft', under: 'slideLeft' },
+    slideTop: { top: 'slideTop', under: 'slideTop' },
+    slideBottom: { top: 'slideBottom', under: 'slideBottom' },
+    fade: { top: 'fade', under: 'fade' },
+    mega: { top: 'fade', under: 'folding' },
     none: { top: 'none', under: 'none' },
   };
 
@@ -100,13 +104,13 @@ export default class Menu {
 
     this.menuItems.forEach((item) => {
       let transition;
-      if (item.content.closest(this.options.child)) {
-        transition = this.settings[this.options.transition].under;
+      if (item.container.closest(this.options.child)) {
+        transition = this.settings[this.options.type].under;
       } else {
-        transition = this.settings[this.options.transition].top;
+        transition = this.settings[this.options.type].top;
       }
 
-      item.setOptions({ ...options, transition: transition });
+      item.setOptions({ ...options, transition });
     });
   }
 
@@ -169,6 +173,10 @@ class MenuItem extends Disclosure {
   }
 
   private onFocusoutContainer(ev: FocusEvent) {
+    if (!this.leave) {
+      return;
+    }
+
     if (ev.relatedTarget && !this.content.contains(ev.relatedTarget as Node)) {
       this.close();
     }

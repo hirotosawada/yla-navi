@@ -29,7 +29,7 @@ export interface MenuItemOptions extends DisclosureOptions {
   isCloseSiblings?: boolean;
 }
 
-export interface MenuOptions extends MenuItemOptions {
+export interface MenuOptions extends Omit<MenuItemOptions, 'transition'> {
   type?: string;
 }
 

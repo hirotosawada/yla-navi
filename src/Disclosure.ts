@@ -1,4 +1,7 @@
-import { FadeTransition, FoldingTransition, SlideBottomTransition, SlideLeftTransition, SlideRightTransition, SlideTopTransition, Transition } from './Transition';
+import {
+ FadeTransition, FoldingTransition, SlideBottomTransition, SlideLeftTransition,
+ SlideRightTransition, SlideTopTransition, Transition
+} from './Transition';
 import Trigger from './Trigger';
 import { DisclosureOptions } from './type';
 
