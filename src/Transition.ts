@@ -256,3 +256,45 @@ export class SlideRightTransition extends Transition {
     return [keyframe, this.keyFrameDefault.close];
   }
 }
+
+export class FadeFoldingTransition extends Transition {
+  keyFrameDefault = { open: { height: 'auto', opacity: 1 }, close: { height: '0px', opacity: 0 } };
+
+  getKeyframesOpen(): Keyframe[] {
+    const currentStyle = getComputedStyle(this.content);
+    let keyframe: Keyframe = this.keyFrameDefault.close;
+
+    const firstChild = this.content.firstElementChild as HTMLElement;
+    const heightInner = firstChild ? firstChild.scrollHeight : this.content.scrollHeight;
+
+    if (parseInt(currentStyle.height) > 0 && parseInt(currentStyle.height) < heightInner) {
+      keyframe = { height: currentStyle.height, opacity: currentStyle.opacity };
+    }
+
+    return [keyframe, { height: `${heightInner}px`, opacity: 1 }];
+  }
+
+  getKeyframesClose(): Keyframe[] {
+    const currentStyle = getComputedStyle(this.content);
+    let keyframe: Keyframe = this.keyFrameDefault.open;
+
+    keyframe = { height: currentStyle.height, opacity: currentStyle.opacity  };
+
+    return [keyframe, this.keyFrameDefault.close];
+  }
+
+  beforeOpen() {
+    this.content.style.overflow = 'hidden';
+  }
+  afterOpen() {
+    this.content.style.overflow = '';
+  }
+
+  beforeClose() {
+    this.content.style.overflow = 'hidden';
+  }
+  afterClose() {
+    this.content.style.overflow = '';
+
+  }
+}

@@ -1,6 +1,6 @@
 import {
- FadeTransition, FoldingTransition, SlideBottomTransition, SlideLeftTransition,
- SlideRightTransition, SlideTopTransition, Transition
+ FadeFoldingTransition, FadeTransition, FoldingTransition, SlideBottomTransition,
+ SlideLeftTransition, SlideRightTransition, SlideTopTransition, Transition
 } from './Transition';
 import Trigger from './Trigger';
 import { DisclosureOptions } from './type';
@@ -118,6 +118,8 @@ export default class Disclosure {
         return new FadeTransition(this.content);
       case 'folding':
         return new FoldingTransition(this.content);
+      case 'fadeFolding':
+        return new FadeFoldingTransition(this.content);
       case 'slideTop':
         return new SlideTopTransition(this.content);
       case 'slideBottom':
