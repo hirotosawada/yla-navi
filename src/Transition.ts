@@ -87,7 +87,8 @@ export class FadeTransition extends Transition {
 }
 
 export class FoldingTransition extends Transition {
-  keyFrameDefault = { open: { height: 'auto', opacity: 1 }, close: { height: '0px', opacity: 0 } };
+  keyFrameDefault = { open: { height: 'auto' }, close: { height: '0px' } };
+  // keyFrameDefault = { open: { height: 'auto', opacity: 1 }, close: { height: '0px', opacity: 0 } };
 
   getKeyframesOpen(): Keyframe[] {
     const currentStyle = getComputedStyle(this.content);
@@ -97,10 +98,12 @@ export class FoldingTransition extends Transition {
     const heightInner = firstChild ? firstChild.scrollHeight : this.content.scrollHeight;
 
     if (parseInt(currentStyle.height) > 0 && parseInt(currentStyle.height) < heightInner) {
-      keyframe = { height: currentStyle.height, opacity: 0 };
+      keyframe = { height: currentStyle.height };
+      // keyframe = { height: currentStyle.height, opacity: 0 };
     }
 
-    return [keyframe, { height: `${heightInner}px`, opacity: 1 }];
+    return [keyframe, { height: `${heightInner}px` }];
+    // return [keyframe, { height: `${heightInner}px`, opacity: 1 }];
     // return [];
   }
 
@@ -111,7 +114,8 @@ export class FoldingTransition extends Transition {
     // const firstChild = this.content.firstElementChild as HTMLElement;
     // const heightInner = firstChild ? firstChild.scrollHeight : this.content.scrollHeight;
 
-    keyframe = { height: currentStyle.height, opacity: 1 };
+    keyframe = { height: currentStyle.height };
+    // keyframe = { height: currentStyle.height, opacity: 1 };
     // if (parseInt(currentStyle.height) > 0) {
     // }
 
