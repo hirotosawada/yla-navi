@@ -1,13 +1,13 @@
-import Drawer from './Drawer';
 import Menu from './Menu';
+import Navi from './Navi';
 
-export default Drawer;
+export default Navi;
 export { Menu };
 
 /*
 [ts]
-import Drawer, {Menu} from 'drawer-menu';
-const drawer = new Drawer();
+import Navi, {Menu} from 'drawer-menu';
+const navi = new Navi();
 const menu = new Menu();
 */
 
@@ -15,9 +15,9 @@ const menu = new Menu();
 [umd]
 <script src="drawer-menu.min.js"></script>
 <script>
-  const Drawer = window.drawer_menu.default;
+  const Navi = window.drawer_menu.default;
   const Menu = window.drawer_menu.Menu;
-  const drawer = new Drawer();
+  const navi = new Navi();
   const menu = new Menu();
 </script>
 

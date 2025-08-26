@@ -33,7 +33,7 @@ export interface MenuOptions extends Omit<MenuItemOptions, 'transition'> {
   type?: string;
 }
 
-export interface DrawerOptions {
+export interface NaviOptions {
   selectorTrigger?: string;
   selectorOverlay?: string;
   selectorContent?: string;
@@ -48,7 +48,7 @@ export interface DrawerOptions {
 }
 
 // ========== ========== ========== ========== ==========
-export interface DrawerOptions2 {
+export interface NaviOptions2 {
   content?: string;
   overlay?: string;
   trigger?: string;

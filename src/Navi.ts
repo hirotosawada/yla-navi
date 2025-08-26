@@ -1,9 +1,9 @@
 import Disclosure from './Disclosure';
-import { DrawerOptions } from './type';
+import { NaviOptions } from './type';
 
-export default class Drawer {
+export default class Navi {
   // DOM
-  private drawer: HTMLElement | null = null;
+  private navi: HTMLElement | null = null;
   private content: HTMLElement | null = null;
   private overlay: HTMLElement | null = null;
   private trigger: NodeListOf<HTMLElement>;
@@ -35,39 +35,39 @@ export default class Drawer {
   private scrollEventFired: boolean = false;
 
   //オプション
-  private optionsDefaut: Required<DrawerOptions> = {
-    selectorTrigger: '.drawer__trigger',
-    selectorOverlay: '.drawer__overlay',
-    selectorContent: '.drawer__content',
+  private optionsDefaut: Required<NaviOptions> = {
+    selectorTrigger: '.navi__trigger',
+    selectorOverlay: '.navi__overlay',
+    selectorContent: '.navi__content',
     breakpoint: null,
 
     transition: '',
     duration: 600,
     scroll: { over: 200, up: 0, down: 0 },
   };
-  private options: Required<DrawerOptions>;
+  private options: Required<NaviOptions>;
 
-  constructor(container: HTMLElement | null, options?: DrawerOptions) {
+  constructor(container: HTMLElement | null, options?: NaviOptions) {
     this.options = Object.assign({}, this.optionsDefaut, options);
 
-    this.drawer = container;
-    this.drawer?.classList.add('is-init');
+    this.navi = container;
+    this.navi?.classList.add('is-init');
     this.overlay = document.querySelector<HTMLElement>(this.options.selectorOverlay);
     this.overlay ? (this.overlay.style.display = 'none') : null;
 
     this.content = document.querySelector<HTMLElement>(this.options.selectorContent);
     this.trigger = document.querySelectorAll<HTMLElement>(this.options.selectorTrigger);
 
-    this.isInit = !!this.drawer && !!this.content && this.trigger.length > 0;
+    this.isInit = !!this.navi && !!this.content && this.trigger.length > 0;
 
     if (!this.isInit) {
-      throw new Error('Drawer: Not found element');
+      throw new Error('Navi: Not found element');
     }
 
-    this.disclosure = new Disclosure(this.drawer, this.trigger, { onOpen: this.onOpen.bind(this), onClose: this.onClose.bind(this), transition: this.options.transition, duration: this.options.duration });
+    this.disclosure = new Disclosure(this.navi, this.trigger, { onOpen: this.onOpen.bind(this), onClose: this.onClose.bind(this), transition: this.options.transition, duration: this.options.duration });
 
-    this.anchors = this.drawer!.querySelectorAll<HTMLAnchorElement>('a[href^="#"]');
-    this.focusable = this.drawer!.querySelectorAll<HTMLElement>('a, button, input, textarea, select, [tabindex]:not([tabindex="-1"])');
+    this.anchors = this.navi!.querySelectorAll<HTMLAnchorElement>('a[href^="#"]');
+    this.focusable = this.navi!.querySelectorAll<HTMLElement>('a, button, input, textarea, select, [tabindex]:not([tabindex="-1"])');
 
     this.initializeEventHandlers();
     this.addEvents();
@@ -125,7 +125,7 @@ export default class Drawer {
     if (this.isActive) {
       this.disclosure.close();
 
-      this.drawer!.dispatchEvent(new CustomEvent('drawer:anchor', { detail: { event } }));
+      this.navi!.dispatchEvent(new CustomEvent('navi:anchor', { detail: { event } }));
     }
   }
 
@@ -154,7 +154,7 @@ export default class Drawer {
       }
     }
 
-    this.drawer!.dispatchEvent(new CustomEvent('drawer:changeMediaQuery', { detail: { event } }));
+    this.navi!.dispatchEvent(new CustomEvent('navi:changeMediaQuery', { detail: { event } }));
   }
 
   private onScroll() {
@@ -188,11 +188,11 @@ export default class Drawer {
         if (!this.scrollEventFired) {
           if (this.scrollBuffer > (this.options.scroll.down || 0)) {
             console.log('is-scrolled-down');
-            this.drawer?.dispatchEvent(new CustomEvent('drawer:scrolldown'));
+            this.navi?.dispatchEvent(new CustomEvent('navi:scrolldown'));
             this.scrollEventFired = true;
           } else if (this.scrollBuffer < -(this.options.scroll.up || 0)) {
             console.log('is-scrolled-up');
-            this.drawer?.dispatchEvent(new CustomEvent('drawer:scrollup'));
+            this.navi?.dispatchEvent(new CustomEvent('navi:scrollup'));
             this.scrollEventFired = true;
           }
         }
@@ -207,19 +207,19 @@ export default class Drawer {
   // ---------- ----------
 
   private activate() {
-    // console.log('drawer: activate');
+    // console.log('navi: activate');
     this.isActive = true;
-    this.drawer!.classList.add('is-active');
+    this.navi!.classList.add('is-active');
     this.disclosure.setDisabled(false);
   }
 
   private deactivate() {
-    // console.log('drawer: deactivate');
+    // console.log('navi: deactivate');
     this.isActive = false;
-    this.drawer!.classList.remove('is-active');
+    this.navi!.classList.remove('is-active');
     this.disclosure.setDisabled(true);
     this.disclosure.resetAnime();
-    // this.drawer?.getAnimations().forEach((el) => {
+    // this.navi?.getAnimations().forEach((el) => {
     //   console.log('getAnimations');
 
     //   el.cancel();
@@ -232,12 +232,12 @@ export default class Drawer {
   anime: { [key: string]: Keyframe[] } = { fade: [{ opacity: '0' }, { opacity: '1' }], top: [{ transform: 'translateY(-100%)' }, { transform: 'translateY(0%)' }], right: [{ transform: 'translateX(100%)' }, { transform: 'translateX(0%)' }], bottom: [{ transform: 'translateY(100%)' }, { transform: 'translateY(0%)' }], left: [{ transform: 'translateX(-100%)' }, { transform: 'translateX(0%)' }] };
 
   private onOpen() {
-    // console.log('drawer: onOpen');
+    // console.log('navi: onOpen');
 
     this.scrollLock();
     document.addEventListener('keydown', this.handleFocusTrap);
 
-    this.drawer!.dispatchEvent(new CustomEvent('drawer:open'));
+    this.navi!.dispatchEvent(new CustomEvent('navi:open'));
 
     const animations: Promise<Animation>[] = [];
     if (this.overlay) {
@@ -249,13 +249,13 @@ export default class Drawer {
 
   private onClose(): Promise<void> {
     // Promiseで、アニメーション後に Disclosure を閉じる
-    // console.log('drawer: onClose');
+    // console.log('navi: onClose');
 
     document.removeEventListener('keydown', this.handleFocusTrap);
     (document.activeElement as HTMLElement)?.blur();
 
     this.scrollUnlock();
-    this.drawer!.dispatchEvent(new CustomEvent('drawer:close'));
+    this.navi!.dispatchEvent(new CustomEvent('navi:close'));
 
     const animations: Promise<Animation>[] = [];
     if (this.overlay) {
@@ -342,17 +342,17 @@ export default class Drawer {
   }
 
   on(eventName: string, callback: (event: Event) => void) {
-    if (eventName === 'drawer:anchor') {
-      this.drawer!.addEventListener(eventName, (ev: Event) => {
+    if (eventName === 'navi:anchor') {
+      this.navi!.addEventListener(eventName, (ev: Event) => {
         const customEvent = ev as CustomEvent;
         callback(customEvent.detail.event);
       });
-    } else if (eventName === 'drawer:changeMediaQuery') {
-      this.drawer!.addEventListener(eventName, (ev: Event) => {
+    } else if (eventName === 'navi:changeMediaQuery') {
+      this.navi!.addEventListener(eventName, (ev: Event) => {
         callback(ev as MediaQueryListEvent);
       });
     } else {
-      this.drawer!.addEventListener(eventName, callback);
+      this.navi!.addEventListener(eventName, callback);
     }
   }
 
@@ -360,7 +360,7 @@ export default class Drawer {
     this.close();
 
     this.removeEvents();
-    this.drawer = null;
+    this.navi = null;
     this.content = null;
     this.overlay = null;
     this.trigger = undefined as unknown as NodeListOf<HTMLElement>;
