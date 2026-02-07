@@ -1,4 +1,10 @@
-/** エントリ: default Yla (正式名 Ylä), named Valikko */
+/**
+ * @packageDocumentation
+ * yla-navi: ヘッダーナビ（Yla）とドロップダウンメニュー（Valikko）のライブラリ
+ *
+ * - **Yla** (default): ドロワー／オーバーレイ型ナビ。breakpoint 未満で有効。
+ * - **Valikko** (named): 多段ドロップダウン。breakpoints でレスポンシブにオプションを切り替え可能。
+ */
 import Valikko from './Valikko';
 import Yla from './Yla';
 

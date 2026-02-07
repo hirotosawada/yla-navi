@@ -2,7 +2,8 @@ import Disclosure from './Disclosure';
 import { DisclosureTransitionType, YlaOptions } from './type';
 
 /**
- * Ylä （ウラ） ヘッダーナビゲーション
+ * ドロワー／オーバーレイ型のヘッダーナビゲーション（正式名: Ylä）。
+ * ブレークポイント未満でドロワーを有効にし、トリガー・オーバーレイ・コンテンツの開閉を行う。
  */
 export default class Yla {
   // DOM
@@ -50,6 +51,10 @@ export default class Yla {
   };
   private options: Required<YlaOptions>;
 
+  /**
+   * @param container - ドロワーのルート要素（.navi など）
+   * @param options - セレクタ・breakpoint・transition などのオプション
+   */
   constructor(container: HTMLElement | null, options?: YlaOptions) {
     this.options = Object.assign({}, this.optionsDefault, options);
 
@@ -316,18 +321,32 @@ export default class Yla {
 
   // ========== ========== ========== ========== ==========
 
+  /** ドロワーが開いているか */
   get isOpen() {
     return this.disclosure.isOpen;
   }
 
+  /**
+   * ドロワーを開く
+   * @param transition - この回だけ使うトランジション（省略時はオプションの transition）
+   */
   open(transition?: DisclosureTransitionType) {
     this.disclosure.open(transition);
   }
 
+  /**
+   * ドロワーを閉じる
+   * @param transition - この回だけ使うトランジション（省略時はオプションの transition）
+   */
   close(transition?: DisclosureTransitionType) {
     this.disclosure.close(transition);
   }
 
+  /**
+   * カスタムイベントのリスナーを登録する
+   * @param eventName - 'yla:open' | 'yla:close' | 'yla:anchor' | 'yla:changeMediaQuery' など
+   * @param callback - 発火時に呼ばれる関数
+   */
   on(eventName: string, callback: (event: Event) => void) {
     if (eventName === 'yla:anchor') {
       this.container!.addEventListener(eventName, (ev: Event) => {
@@ -343,6 +362,7 @@ export default class Yla {
     }
   }
 
+  /** イベントを外し、インスタンスを破棄する */
   destroy() {
     this.close();
 

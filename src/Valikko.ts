@@ -26,7 +26,9 @@ const defaultValikkoOptions = {
 type ValikkoResolvedOptions = typeof defaultValikkoOptions & ValikkoOptions;
 
 /**
- * Valikko （バリッコ） メニュー ライブラリ
+ * ドロップダウン／アコーディオン型のメニュー（Valikko）。
+ * .valikko-item / .valikko-trigger / .valikko-child の構造で多段メニューを開閉する。
+ * breakpoints でレスポンシブにオプションを切り替え可能（min-width でマージ）。
  */
 export default class Valikko {
   container: HTMLElement;
@@ -40,6 +42,10 @@ export default class Valikko {
   private mediaQueries: Map<number, MediaQueryList> = new Map();
   private handleMediaChange: () => void = () => {};
 
+  /**
+   * @param container - メニューのルート要素（.valikko の ul など）
+   * @param options - セレクタ・transition・breakpoints などのオプション
+   */
   constructor(container: HTMLElement | null, options: ValikkoOptions = {}) {
     if (!container) {
       throw new Error('Valikko: Missing container');
@@ -141,6 +147,10 @@ export default class Valikko {
     return isTopLevel ? top : under;
   }
 
+  /**
+   * オプションを更新する（breakpoints の変更は反映されない。インスタンス作成時の breakpoints を使用）。
+   * @param options - マージするオプション
+   */
   setOptions(options: ValikkoOptions) {
     this.options = { ...this.options, ...options } as ValikkoResolvedOptions;
 
@@ -150,10 +160,15 @@ export default class Valikko {
     });
   }
 
+  /**
+   * 開いているサブメニューをすべて閉じる
+   * @param transition - この回だけ使うトランジション（省略時はオプションの transition）
+   */
   close(transition?: DisclosureTransitionType) {
     this.menuItems.forEach((item) => item.close(transition));
   }
 
+  /** イベントを外し、インスタンスを破棄する */
   destroy(): void {
     this.mediaQueries.forEach((mq) => mq.removeEventListener('change', this.handleMediaChange));
     this.mediaQueries.clear();
