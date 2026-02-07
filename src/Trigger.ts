@@ -30,7 +30,7 @@ export default class Trigger {
     this.options = Object.assign({}, this.options, options);
 
     this.trigger.setAttribute('aria-controls', this.id);
-    this.trigger.setAttribute('aria-expanded', 'false');
+    this.trigger.setAttribute(this.options.isTab ? 'aria-selected' : 'aria-expanded', 'false');
     this.trigger.setAttribute('role', 'button');
     this.trigger.setAttribute('tabindex', '0');
 
@@ -91,7 +91,7 @@ export default class Trigger {
   // ========== ========== ========== ========== ==========
 
   setExpanded(expanded: boolean) {
-    this.trigger.setAttribute('aria-expanded', expanded ? 'true' : 'false');
+    this.trigger.setAttribute(this.options.isTab ? 'aria-selected' : 'aria-expanded', expanded ? 'true' : 'false');
   }
 
   setDisabled(isDisabled: boolean) {
