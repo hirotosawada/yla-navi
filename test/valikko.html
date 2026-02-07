@@ -1,0 +1,70 @@
+<!doctype html>
+<html lang="ja">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Valikko テスト</title>
+  </head>
+  <body class="page-valikko">
+    <header class="header">
+      <div class="header__inner">
+        <div class="header__logo">logo</div>
+        <nav class="header__nav" aria-label="メニュー">
+          <ul class="valikko" id="valikko">
+            <li class="valikko-item">
+              <a href="#" class="valikko-trigger">メニュー１</a>
+              <div class="valikko-child">
+                <ul>
+                  <li class="valikko-item"><a href="#" class="valikko-trigger">メニュー１−１</a></li>
+                  <li class="valikko-item">
+                    <a href="#" class="valikko-trigger">メニュー１−２</a>
+                    <div class="valikko-child">
+                      <ul>
+                        <li class="valikko-item"><a href="#" class="valikko-trigger">メニュー１−２−１</a></li>
+                        <li class="valikko-item"><a href="#" class="valikko-trigger">メニュー１−２−２</a></li>
+                        <li class="valikko-item"><a href="#" class="valikko-trigger">メニュー１−２−３</a></li>
+                      </ul>
+                    </div>
+                  </li>
+                  <li class="valikko-item"><a href="#" class="valikko-trigger">メニュー１−３</a></li>
+                </ul>
+              </div>
+            </li>
+            <li class="valikko-item">
+              <a href="#" class="valikko-trigger">メニュー２</a>
+            </li>
+            <li class="valikko-item">
+              <a href="#" class="valikko-trigger">メニュー３</a>
+              <div class="valikko-child">
+                <ul>
+                  <li class="valikko-item"><a href="#" class="valikko-trigger">メニュー３−１</a></li>
+                  <li class="valikko-item">
+                    <a href="#" class="valikko-trigger">メニュー３−２</a>
+                    <div class="valikko-child">
+                      <ul>
+                        <li class="valikko-item"><a href="#" class="valikko-trigger">メニュー３−２−１</a></li>
+                        <li class="valikko-item"><a href="#" class="valikko-trigger">メニュー３−２−２</a></li>
+                      </ul>
+                    </div>
+                  </li>
+                </ul>
+              </div>
+            </li>
+            <li class="valikko-item">
+              <a href="#" class="valikko-trigger">メニュー４</a>
+            </li>
+          </ul>
+        </nav>
+      </div>
+    </header>
+
+    <main class="main main--valikko">
+      <p class="main__back"><a href="/">← 一覧に戻る</a></p>
+      <h1>Valikko テスト</h1>
+      <p>ドロップダウンメニュー（Valikko）のみ。Yla のドロワーは使っていません。</p>
+      <p>768px 以上で横並びメニュー＋ホバー/フォーカスで開閉、以下で縦積み＋クリックで開閉のスタイルになります。</p>
+    </main>
+
+    <script type="module" src="/src/valikko.ts"></script>
+  </body>
+</html>

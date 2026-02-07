@@ -47,15 +47,24 @@ export interface ValikkoTransitionTopUnder {
 /** 全階層同じなら文字列、トップとネストで分けたいなら { top, under }。 */
 export type ValikkoTransitionOption = DisclosureTransitionType | ValikkoTransitionTopUnder;
 
+/** breakpoints[minWidth] = その幅(px)以上で適用するオプション。Swiper と同様、幅の小さい順にマージされる。 */
+export type ValikkoBreakpoints = Record<number, Partial<Omit<ValikkoOptions, 'breakpoints'>>>;
+
 export interface ValikkoOptions extends Omit<ValikkoItemOptions, 'transition'> {
   /** 省略時は 'folding'。{ top, under } で階層ごとに指定可能。 */
   transition?: ValikkoTransitionOption;
+  /**
+   * レスポンシブ用。key = minWidth(px)。viewport が key 以上のときそのオプションをマージ（小さい key から順に適用）。
+   * 例: breakpoints: { 0: { click: true }, 768: { enter: true, leave: true } }
+   */
+  breakpoints?: ValikkoBreakpoints;
 }
 
 export interface YlaOptions {
   selectorTrigger?: string;
   selectorOverlay?: string;
   selectorContent?: string;
+  /** この幅(px)以上でドロワー無効、未満で有効。min-width で判定（Valikko の breakpoints と同一基準）。null で常時有効。 */
   breakpoint?: number | null;
   transition?: DisclosureTransitionType;
   duration?: number;

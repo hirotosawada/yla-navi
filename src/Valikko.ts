@@ -1,8 +1,11 @@
 import Disclosure from './Disclosure';
 // ドロップダウン
 import {
- DisclosureOptions, DisclosureTransitionType, ValikkoItemOptions, ValikkoOptions,
- ValikkoTransitionTopUnder
+  DisclosureOptions,
+  DisclosureTransitionType,
+  ValikkoItemOptions,
+  ValikkoOptions,
+  ValikkoTransitionTopUnder,
 } from './type';
 
 const defaultValikkoOptions = {
@@ -15,13 +18,16 @@ const defaultValikkoOptions = {
   click: false,
   focus: true,
   enter: true,
-  leave: true, // content ではなく container の mouseleave で閉じる
+  leave: true,
   duration: 400,
 } satisfies ValikkoOptions;
 
 /** コンストラクタで defaults とマージしたあと。defaultValikkoOptions のキーは必須になる。 */
 type ValikkoResolvedOptions = typeof defaultValikkoOptions & ValikkoOptions;
 
+/**
+ * Valikko （バリッコ） メニュー ライブラリ
+ */
 export default class Valikko {
   container: HTMLElement;
   menuItems: ValikkoItem[] = [];
@@ -29,14 +35,21 @@ export default class Valikko {
   options: ValikkoResolvedOptions;
 
   private handleOnLeave: () => void;
+  private baseOptions: ValikkoResolvedOptions;
+  private optionsBreakpoints: Record<number, Partial<ValikkoOptions>> = {};
+  private mediaQueries: Map<number, MediaQueryList> = new Map();
+  private handleMediaChange: () => void = () => {};
 
   constructor(container: HTMLElement | null, options: ValikkoOptions = {}) {
     if (!container) {
       throw new Error('Valikko: Missing container');
     }
 
+    const { breakpoints, ...rest } = options;
     this.container = container;
-    this.options = { ...defaultValikkoOptions, ...options } as ValikkoResolvedOptions;
+    this.baseOptions = { ...defaultValikkoOptions, ...rest } as ValikkoResolvedOptions;
+    this.options = { ...this.baseOptions };
+    this.optionsBreakpoints = breakpoints ?? {};
 
     const items = this.container.querySelectorAll<HTMLElement>(this.options.item);
 
@@ -64,6 +77,32 @@ export default class Valikko {
 
     this.handleOnLeave = this.onLeave.bind(this);
     this.container.addEventListener('mouseleave', this.handleOnLeave);
+
+    if (Object.keys(this.optionsBreakpoints).length > 0 && typeof window !== 'undefined') {
+      this.handleMediaChange = () => {
+        this.close('none');
+        this.applyBreakpoints();
+      };
+      const keys = Object.keys(this.optionsBreakpoints).map(Number).sort((a, b) => a - b);
+      keys.forEach((key) => {
+        const mq = window.matchMedia(`(min-width: ${key}px)`);
+        this.mediaQueries.set(key, mq);
+        mq.addEventListener('change', this.handleMediaChange);
+      });
+      this.applyBreakpoints();
+    }
+  }
+
+  /** 現在のメディアクエリに応じて breakpoints をマージして setOptions する。CSS と同じ viewport 基準でスクロールバーずれを防ぐ。 */
+  private applyBreakpoints(): void {
+    const keys = Array.from(this.mediaQueries.keys())
+      .filter((k) => this.mediaQueries.get(k)?.matches === true)
+      .sort((a, b) => a - b);
+    let opts: Partial<ValikkoOptions> = { ...this.baseOptions };
+    for (const k of keys) {
+      opts = { ...opts, ...this.optionsBreakpoints[k] };
+    }
+    this.setOptions(opts);
   }
 
   private onLeave(): void {
@@ -116,6 +155,8 @@ export default class Valikko {
   }
 
   destroy(): void {
+    this.mediaQueries.forEach((mq) => mq.removeEventListener('change', this.handleMediaChange));
+    this.mediaQueries.clear();
     this.container.removeEventListener('mouseleave', this.handleOnLeave);
     this.menuItems.forEach((item) => item.destroy());
     this.menuItems = [];
