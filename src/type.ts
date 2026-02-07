@@ -16,8 +16,6 @@ export interface DisclosureOptions {
 
   transition?: DisclosureTransitionType;
   duration?: number;
-
-  isTab?: boolean;
 }
 
 export interface TriggerOptions {
@@ -28,8 +26,6 @@ export interface TriggerOptions {
   click?: boolean;
   focus?: boolean;
   enter?: boolean;
-
-  isTab?: boolean;
 }
 
 export interface ValikkoItemOptions extends DisclosureOptions {

@@ -33,8 +33,6 @@ export default class Disclosure {
 
     transition: 'fade',
     duration: 400,
-
-    isTab: false,
   };
 
   private _animation: Animation | null = null;
@@ -101,7 +99,7 @@ export default class Disclosure {
       },
     };
 
-    return new Trigger(this.id, trigger, { ...callbacks, click: this.options.click, focus: this.options.focus, enter: this.options.enter, isTab: this.options.isTab || false });
+    return new Trigger(this.id, trigger, { ...callbacks, click: this.options.click, focus: this.options.focus, enter: this.options.enter });
   }
 
   private createTransitionInstance(type: DisclosureTransitionType): Transition | null {
