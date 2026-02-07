@@ -1,8 +1,8 @@
 import Disclosure from './Disclosure';
-import { YlaOptions, DisclosureTransitionType } from './type';
+import { DisclosureTransitionType, YlaOptions } from './type';
 
 /**
- * ドロワー／オーバーレイナビゲーション（正式名: Ylä）
+ * Ylä （ウラ） ヘッダーナビゲーション
  */
 export default class Yla {
   // DOM
@@ -44,7 +44,7 @@ export default class Yla {
     selectorContent: '.yla-content',
     breakpoint: null,
 
-    transition: '',
+    transition: 'fade',
     duration: 600,
     scroll: { over: 200, up: 0, down: 0 },
   };
@@ -56,7 +56,7 @@ export default class Yla {
     this.container = container;
     this.container?.classList.add('yla-init');
     this.overlay = document.querySelector<HTMLElement>(this.options.selectorOverlay);
-    this.overlay ? (this.overlay.style.display = 'none') : null;
+    if (this.overlay) this.overlay.style.display = 'none';
 
     this.content = document.querySelector<HTMLElement>(this.options.selectorContent);
     this.trigger = document.querySelectorAll<HTMLElement>(this.options.selectorTrigger);
@@ -104,7 +104,7 @@ export default class Yla {
     document.addEventListener('keydown', this.handleKeydownEsc);
 
     if (this.options.breakpoint) {
-      this.mediaQuery = window.matchMedia(`(max-width: ${this.options.breakpoint}px)`);
+      this.mediaQuery = window.matchMedia(`(min-width: ${this.options.breakpoint}px)`);
       this.mediaQuery.addEventListener('change', this.handleChangeMediaQuery);
       this.changeMediaQuery({ matches: this.mediaQuery.matches, media: this.mediaQuery.media } as MediaQueryListEvent);
     } else {
@@ -148,9 +148,8 @@ export default class Yla {
 
   private changeMediaQuery(event: MediaQueryListEvent) {
     this.close('none');
+    // min-width: この幅以上ならドロワー無効、未満ならドロワー有効（Valikko の breakpoints と揃えたスマホファースト）
     if (event.matches) {
-      this.activate();
-    } else {
       if (this.isOpen) {
         this.disclosure.close('none').then(() => {
           this.deactivate();
@@ -158,6 +157,8 @@ export default class Yla {
       } else {
         this.deactivate();
       }
+    } else {
+      this.activate();
     }
 
     this.container!.dispatchEvent(new CustomEvent('yla:changeMediaQuery', { detail: { event } }));
