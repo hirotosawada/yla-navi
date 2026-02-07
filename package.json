@@ -1,8 +1,32 @@
 {
-  "name": "vite-project",
+  "name": "@darowasahito/yla-navi",
+  "description": "Ylä — navigation library",
+  "displayName": "Ylä",
+  "keywords": [
+    "navigation",
+    "javascript",
+    "typescript",
+    "ドロワーメニュー"
+  ],
   "private": true,
   "version": "0.0.0",
+  "author": "darowasahito",
+  "license": "MIT",
   "type": "module",
+  "files": [
+    "dist",
+    "src"
+  ],
+  "main": "./dist/yla-bundle.min.js",
+  "module": "./dist/yla-bundle.js",
+  "types": "./dist/yla-bundle.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/yla-bundle.d.ts",
+      "import": "./dist/yla-bundle.js",
+      "require": "./dist/yla-bundle.min.js"
+    }
+  },
   "scripts": {
     "dev": "vite",
     "build": "tsc && vite build",
@@ -11,6 +35,7 @@
     "build:test": "tsc && vite build --config test/vite.config.js"
   },
   "devDependencies": {
+    "sass": "^1.81.0",
     "typescript": "~5.6.2",
     "vite": "^6.0.5",
     "vite-plugin-dts": "^4.5.0"
