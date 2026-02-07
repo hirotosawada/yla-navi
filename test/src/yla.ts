@@ -1,13 +1,13 @@
 import './scss/style.scss';
-import './scss/_navi-page.scss';
+import './scss/_yla-page.scss';
 
 import Yla from '../../src/main.ts';
 
 import type { YlaOptions, DisclosureTransitionType } from '../../src/type';
 
 const container = document.querySelector<HTMLElement>('.navi');
-const optionsForm = document.getElementById('navi-options');
-const applyButton = document.getElementById('navi-options-apply');
+const optionsForm = document.getElementById('yla-options');
+const applyButton = document.getElementById('yla-options-apply');
 
 function getOptionsFromForm(): YlaOptions {
   const form = optionsForm;

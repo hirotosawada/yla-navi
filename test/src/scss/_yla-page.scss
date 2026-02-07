@@ -1,5 +1,5 @@
 // ========== ========== ========== ========== ==========
-// Navi テストページ専用（page-navi）
+// Yla テストページ専用（page-yla）
 // PC: 横並び追従ヘッダー / SP: 全画面ハンバーガーメニュー
 // ========== ========== ========== ========== ==========
 
@@ -8,7 +8,7 @@ $header-height: 56px;
 $header-padding-x: 1.5rem;
 $container-max: 960px;
 
-.page-navi {
+.page-yla {
   .header {
     position: sticky;
     top: 0;
@@ -41,7 +41,7 @@ $container-max: 960px;
       }
     }
 
-    // PC: .navi__content をヘッダー内で横並び（ナビは1つ、Navi が content の扱いを切り替える）
+    // PC: .navi__content をヘッダー内で横並び
     .navi {
       @media (width > $bp) {
         position: static;
@@ -164,7 +164,6 @@ $container-max: 960px;
       transition: transform 0.2s ease, opacity 0.2s ease;
     }
 
-    // 開いているときのハンバーガー（オプション: JS で aria-expanded に応じクラス付与可）
     &__hamburger[aria-expanded="true"] &__hamburger-bar:nth-child(1) {
       transform: translateY(7px) rotate(45deg);
     }
@@ -419,23 +418,23 @@ $container-max: 960px;
   }
 
   .main__section {
-      padding: 3rem 0;
-      border-bottom: 1px solid #eee;
+    padding: 3rem 0;
+    border-bottom: 1px solid #eee;
 
-      &:last-child {
-        border-bottom: none;
-      }
+    &:last-child {
+      border-bottom: none;
+    }
 
-      h2 {
-        margin: 0 0 0.5rem;
-        font-size: 1.25rem;
-        font-weight: 600;
-      }
+    h2 {
+      margin: 0 0 0.5rem;
+      font-size: 1.25rem;
+      font-weight: 600;
+    }
 
-      p {
-        margin: 0;
-        font-size: 0.9375rem;
-        color: #555;
-      }
+    p {
+      margin: 0;
+      font-size: 0.9375rem;
+      color: #555;
+    }
   }
 }
