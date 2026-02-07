@@ -1,9 +1,12 @@
 import Disclosure from './Disclosure';
-import { NaviOptions } from './type';
+import { YlaOptions, DisclosureTransitionType } from './type';
 
-export default class Navi {
+/**
+ * ドロワー／オーバーレイナビゲーション（正式名: Ylä）
+ */
+export default class Yla {
   // DOM
-  private navi: HTMLElement | null = null;
+  private container: HTMLElement | null = null;
   private content: HTMLElement | null = null;
   private overlay: HTMLElement | null = null;
   private trigger: NodeListOf<HTMLElement>;
@@ -18,7 +21,7 @@ export default class Navi {
   private handleClickOverlay: (event: MouseEvent) => void = () => {};
   private handleClickAnchor: (event: MouseEvent) => void = () => {};
   private handleKeydownEsc: (event: KeyboardEvent) => void = () => {};
-  private handleChangeMediaQuery: (event: MediaQueryListEvent) => any = () => {};
+  private handleChangeMediaQuery: (event: MediaQueryListEvent) => void = () => {};
   private handleOnScroll: () => void = () => {};
 
   // ステータス
@@ -35,39 +38,46 @@ export default class Navi {
   private scrollEventFired: boolean = false;
 
   //オプション
-  private optionsDefaut: Required<NaviOptions> = {
-    selectorTrigger: '.navi__trigger',
-    selectorOverlay: '.navi__overlay',
-    selectorContent: '.navi__content',
+  private optionsDefault: Required<YlaOptions> = {
+    selectorTrigger: '.yla-trigger',
+    selectorOverlay: '.yla-overlay',
+    selectorContent: '.yla-content',
     breakpoint: null,
 
     transition: '',
     duration: 600,
     scroll: { over: 200, up: 0, down: 0 },
   };
-  private options: Required<NaviOptions>;
+  private options: Required<YlaOptions>;
 
-  constructor(container: HTMLElement | null, options?: NaviOptions) {
-    this.options = Object.assign({}, this.optionsDefaut, options);
+  constructor(container: HTMLElement | null, options?: YlaOptions) {
+    this.options = Object.assign({}, this.optionsDefault, options);
 
-    this.navi = container;
-    this.navi?.classList.add('is-init');
+    this.container = container;
+    this.container?.classList.add('yla-init');
     this.overlay = document.querySelector<HTMLElement>(this.options.selectorOverlay);
     this.overlay ? (this.overlay.style.display = 'none') : null;
 
     this.content = document.querySelector<HTMLElement>(this.options.selectorContent);
     this.trigger = document.querySelectorAll<HTMLElement>(this.options.selectorTrigger);
 
-    this.isInit = !!this.navi && !!this.content && this.trigger.length > 0;
+    this.isInit = !!this.container && !!this.content && this.trigger.length > 0;
 
     if (!this.isInit) {
-      throw new Error('Navi: Not found element');
+      throw new Error('Yla: Not found element');
     }
 
-    this.disclosure = new Disclosure(this.navi, this.trigger, { onOpen: this.onOpen.bind(this), onClose: this.onClose.bind(this), transition: this.options.transition, duration: this.options.duration });
+    this.disclosure = new Disclosure(this.container, this.trigger, {
+      onBeforeOpen: this.onBeforeOpen.bind(this),
+      onAfterOpen: this.onAfterOpen.bind(this),
+      onBeforeClose: this.onBeforeClose.bind(this),
+      onAfterClose: this.onAfterClose.bind(this),
+      transition: this.options.transition,
+      duration: this.options.duration,
+    });
 
-    this.anchors = this.navi!.querySelectorAll<HTMLAnchorElement>('a[href^="#"]');
-    this.focusable = this.navi!.querySelectorAll<HTMLElement>('a, button, input, textarea, select, [tabindex]:not([tabindex="-1"])');
+    this.anchors = this.container!.querySelectorAll<HTMLAnchorElement>('a[href^="#"]');
+    this.focusable = this.container!.querySelectorAll<HTMLElement>('a, button, input, textarea, select, [tabindex]:not([tabindex="-1"])');
 
     this.initializeEventHandlers();
     this.addEvents();
@@ -118,33 +128,29 @@ export default class Navi {
   }
 
   private clickOverlay() {
-    this.disclosure.close();
+    this.close();
   }
 
   private clickAnchor(event: MouseEvent) {
     if (this.isActive) {
-      this.disclosure.close();
+      this.close();
 
-      this.navi!.dispatchEvent(new CustomEvent('navi:anchor', { detail: { event } }));
+      this.container!.dispatchEvent(new CustomEvent('yla:anchor', { detail: { event } }));
     }
   }
 
   private keydownEsc(event: KeyboardEvent) {
     // Escキーで閉じる
     if (event.key === 'Escape' && this.isOpen) {
-      this.disclosure.close();
+      this.close();
     }
   }
 
   private changeMediaQuery(event: MediaQueryListEvent) {
     this.close('none');
     if (event.matches) {
-      // console.log(`Viewport <= ${this.options.breakpoint}px`);
-
       this.activate();
     } else {
-      // console.log(`Viewport > ${this.options.breakpoint}px`);
-
       if (this.isOpen) {
         this.disclosure.close('none').then(() => {
           this.deactivate();
@@ -154,7 +160,7 @@ export default class Navi {
       }
     }
 
-    this.navi!.dispatchEvent(new CustomEvent('navi:changeMediaQuery', { detail: { event } }));
+    this.container!.dispatchEvent(new CustomEvent('yla:changeMediaQuery', { detail: { event } }));
   }
 
   private onScroll() {
@@ -180,19 +186,17 @@ export default class Navi {
         this.scrollLast = currentScrollY;
 
         // スクロールのステータスをクラスに反映
-        document.documentElement.classList.toggle('is-scrolled', currentScrollY > (this.options.scroll.over || 0));
-        document.documentElement.classList.toggle('is-scrolling-down', this.scrollBuffer > 0);
-        document.documentElement.classList.toggle('is-scrolling-up', this.scrollBuffer < 0);
+        document.documentElement.classList.toggle('yla-scrolled', currentScrollY > (this.options.scroll.over || 0));
+        document.documentElement.classList.toggle('yla-scrolling-down', this.scrollBuffer > 0);
+        document.documentElement.classList.toggle('yla-scrolling-up', this.scrollBuffer < 0);
 
         // イベント発火
         if (!this.scrollEventFired) {
           if (this.scrollBuffer > (this.options.scroll.down || 0)) {
-            console.log('is-scrolled-down');
-            this.navi?.dispatchEvent(new CustomEvent('navi:scrolldown'));
+            this.container?.dispatchEvent(new CustomEvent('yla:scrolldown'));
             this.scrollEventFired = true;
           } else if (this.scrollBuffer < -(this.options.scroll.up || 0)) {
-            console.log('is-scrolled-up');
-            this.navi?.dispatchEvent(new CustomEvent('navi:scrollup'));
+            this.container?.dispatchEvent(new CustomEvent('yla:scrollup'));
             this.scrollEventFired = true;
           }
         }
@@ -207,75 +211,57 @@ export default class Navi {
   // ---------- ----------
 
   private activate() {
-    // console.log('navi: activate');
     this.isActive = true;
-    this.navi!.classList.add('is-active');
+    this.container!.classList.add('yla-active');
     this.disclosure.setDisabled(false);
   }
 
   private deactivate() {
-    // console.log('navi: deactivate');
     this.isActive = false;
-    this.navi!.classList.remove('is-active');
+    this.container!.classList.remove('yla-active');
     this.disclosure.setDisabled(true);
     this.disclosure.resetAnime();
-    // this.navi?.getAnimations().forEach((el) => {
-    //   console.log('getAnimations');
-
-    //   el.cancel();
-    // });
-
     // TODO: disclosureで、this.content.removeAttribute('aria-hidden'); しているが、メニューをsp、pcで使い回しているかどうかによって変わるかも。
   }
 
-  // ---------- ----------
-  anime: { [key: string]: Keyframe[] } = { fade: [{ opacity: '0' }, { opacity: '1' }], top: [{ transform: 'translateY(-100%)' }, { transform: 'translateY(0%)' }], right: [{ transform: 'translateX(100%)' }, { transform: 'translateX(0%)' }], bottom: [{ transform: 'translateY(100%)' }, { transform: 'translateY(0%)' }], left: [{ transform: 'translateX(-100%)' }, { transform: 'translateX(0%)' }] };
-
-  private onOpen() {
-    // console.log('navi: onOpen');
-
-    this.scrollLock();
-    document.addEventListener('keydown', this.handleFocusTrap);
-
-    this.navi!.dispatchEvent(new CustomEvent('navi:open'));
-
-    const animations: Promise<Animation>[] = [];
+  private onBeforeOpen() {
     if (this.overlay) {
       this.overlay.style.display = 'block';
-      const overlayAnimation = this.overlay.animate(this.anime.fade, { duration: this.options.duration });
-      animations.push(overlayAnimation.finished);
+      this.overlay.animate(this.overlayAnime.fade, { duration: this.options.duration });
     }
   }
 
-  private onClose(): Promise<void> {
-    // Promiseで、アニメーション後に Disclosure を閉じる
-    // console.log('navi: onClose');
+  private onAfterOpen() {
+    this.scrollLock();
+    document.addEventListener('keydown', this.handleFocusTrap);
+    this.container!.dispatchEvent(new CustomEvent('yla:open'));
+  }
 
-    document.removeEventListener('keydown', this.handleFocusTrap);
-    (document.activeElement as HTMLElement)?.blur();
-
-    this.scrollUnlock();
-    this.navi!.dispatchEvent(new CustomEvent('navi:close'));
-
-    const animations: Promise<Animation>[] = [];
+  private onBeforeClose() {
     if (this.overlay) {
-      const keyframe = [...this.anime.fade].reverse();
+      const keyframe = [...this.overlayAnime.fade].reverse();
       const overlayAnimation = this.overlay.animate(keyframe, { duration: this.options.duration });
-      animations.push(overlayAnimation.finished);
-    }
-
-    if (animations) {
-      return new Promise<void>((resolve) => {
-        Promise.all(animations).then(() => {
-          // console.log('animations end overlay');
-          this.overlay ? (this.overlay.style.display = 'none') : null;
-          resolve();
-        });
+      overlayAnimation.finished.then(() => {
+        this.overlay!.style.display = 'none';
       });
     }
-
-    return Promise.resolve();
   }
+
+  private onAfterClose() {
+    document.removeEventListener('keydown', this.handleFocusTrap);
+    (document.activeElement as HTMLElement)?.blur();
+    this.scrollUnlock();
+    this.container!.dispatchEvent(new CustomEvent('yla:close'));
+  }
+
+  // ---------- ----------
+  private overlayAnime: { [key: string]: Keyframe[] } = {
+    fade: [{ opacity: '0' }, { opacity: '1' }],
+    top: [{ transform: 'translateY(-100%)' }, { transform: 'translateY(0%)' }],
+    right: [{ transform: 'translateX(100%)' }, { transform: 'translateX(0%)' }],
+    bottom: [{ transform: 'translateY(100%)' }, { transform: 'translateY(0%)' }],
+    left: [{ transform: 'translateX(-100%)' }, { transform: 'translateX(0%)' }],
+  };
 
   // ---------- ----------
   private scrollLock() {
@@ -283,14 +269,14 @@ export default class Navi {
     this.currentScrollY = window.scrollY;
     document.body.style.width = getComputedStyle(document.body).width;
     document.body.style.top = `-${this.currentScrollY}px`;
-    document.body.classList.add('is-scrolllocked');
+    document.body.classList.add('yla-scrolllocked');
   }
 
   private scrollUnlock() {
     // スクロール位置復元
     document.body.style.top = '';
     document.body.style.width = '';
-    document.body.classList.remove('is-scrolllocked');
+    document.body.classList.remove('yla-scrolllocked');
 
     window.scrollTo({ top: this.currentScrollY, behavior: 'instant' });
   }
@@ -333,26 +319,26 @@ export default class Navi {
     return this.disclosure.isOpen;
   }
 
-  open(transition?: string) {
+  open(transition?: DisclosureTransitionType) {
     this.disclosure.open(transition);
   }
 
-  close(transition?: string) {
+  close(transition?: DisclosureTransitionType) {
     this.disclosure.close(transition);
   }
 
   on(eventName: string, callback: (event: Event) => void) {
-    if (eventName === 'navi:anchor') {
-      this.navi!.addEventListener(eventName, (ev: Event) => {
+    if (eventName === 'yla:anchor') {
+      this.container!.addEventListener(eventName, (ev: Event) => {
         const customEvent = ev as CustomEvent;
         callback(customEvent.detail.event);
       });
-    } else if (eventName === 'navi:changeMediaQuery') {
-      this.navi!.addEventListener(eventName, (ev: Event) => {
+    } else if (eventName === 'yla:changeMediaQuery') {
+      this.container!.addEventListener(eventName, (ev: Event) => {
         callback(ev as MediaQueryListEvent);
       });
     } else {
-      this.navi!.addEventListener(eventName, callback);
+      this.container!.addEventListener(eventName, callback);
     }
   }
 
@@ -360,7 +346,12 @@ export default class Navi {
     this.close();
 
     this.removeEvents();
-    this.navi = null;
+    if (this.overlay) {
+      this.overlay.getAnimations().forEach((a) => a.cancel());
+      this.overlay.style.display = 'none';
+      this.overlay.style.opacity = '';
+    }
+    this.container = null;
     this.content = null;
     this.overlay = null;
     this.trigger = undefined as unknown as NodeListOf<HTMLElement>;

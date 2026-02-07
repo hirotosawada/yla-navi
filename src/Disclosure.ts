@@ -3,7 +3,7 @@ import {
  SlideLeftTransition, SlideRightTransition, SlideTopTransition, Transition
 } from './Transition';
 import Trigger from './Trigger';
-import { DisclosureOptions } from './type';
+import { DisclosureOptions, DisclosureTransitionType } from './type';
 
 export default class Disclosure {
   id: string;
@@ -26,31 +26,26 @@ export default class Disclosure {
     focus: false,
     enter: false,
     leave: false,
-    onOpen: () => {},
-    onClose: () => {},
+    onBeforeOpen: () => {},
+    onAfterOpen: () => {},
+    onBeforeClose: () => {},
+    onAfterClose: () => {},
 
     transition: 'fade',
     duration: 400,
-  };
 
-  anime: { [key: string]: Keyframe[] } = {
-    top: [{ transform: 'translateY(-100%)' }, { transform: 'translateY(0%)' }],
-    right: [{ transform: 'translateX(100%)' }, { transform: 'translateX(0%)' }],
-    bottom: [{ transform: 'translateY(100%)' }, { transform: 'translateY(0%)' }],
-    left: [{ transform: 'translateX(-100%)' }, { transform: 'translateX(0%)' }],
+    isTab: false,
   };
 
   private _animation: Animation | null = null;
 
   constructor(content: HTMLElement | null, triggers: HTMLElement | HTMLElement[] | NodeListOf<HTMLElement> | null, options: DisclosureOptions = {}) {
-    // console.log('Disclosure class initialized');
-
     if (!content) {
       throw new Error('Disclosure: Missing content');
     }
 
     if (!triggers) {
-      throw new Error('Disclosure: Missing triggers');
+      // throw new Error('Disclosure: Missing triggers');
     }
 
     this.options = { ...this.options, ...options };
@@ -73,14 +68,13 @@ export default class Disclosure {
     } else if (triggers instanceof HTMLElement) {
       triggers = [triggers];
     }
-    triggers.forEach((trigger) => {
+    triggers?.forEach((trigger) => {
       this.triggers.push(this.initTrigger(trigger));
     });
   }
   // ========== ========== ========== ========== ==========
   // Private methods
   private onLeave() {
-    // console.log('content: mouseleave', this.options.leave);
     if (this._isAnimating || !this.options.leave) {
       return;
     }
@@ -90,7 +84,7 @@ export default class Disclosure {
 
   private onFocusout(ev: FocusEvent) {
     if (ev.relatedTarget && !this.content.contains(ev.relatedTarget as Node)) {
-      // console.log('フォーカスが container の外へ出ました');
+      // フォーカスが container の外へ出た
     }
   }
 
@@ -107,12 +101,10 @@ export default class Disclosure {
       },
     };
 
-    return new Trigger(this.id, trigger, { ...callbacks, click: this.options.click, focus: this.options.focus, enter: this.options.enter });
+    return new Trigger(this.id, trigger, { ...callbacks, click: this.options.click, focus: this.options.focus, enter: this.options.enter, isTab: this.options.isTab || false });
   }
 
-  private createTransitionInstance(type: string): Transition | null {
-    // console.log(type);
-
+  private createTransitionInstance(type: DisclosureTransitionType): Transition | null {
     switch (type) {
       case 'fade':
         return new FadeTransition(this.content);
@@ -129,7 +121,10 @@ export default class Disclosure {
       case 'slideRight':
         return new SlideRightTransition(this.content);
       case 'none':
+      case '':
+        return null;
       default:
+        console.warn('Disclosure: unknown transition type', type);
         return null;
     }
   }
@@ -142,8 +137,6 @@ export default class Disclosure {
   }
 
   resetAnime(isKeepStyle: boolean = false) {
-    // console.log('reset anime', isKeepStyle);
-
     this.removeStyles();
     this._animation?.commitStyles();
     this._animation?.cancel();
@@ -155,10 +148,10 @@ export default class Disclosure {
 
   // ========== ========== ========== ========== ==========
   // Public methods
-  open(transition: string = this.options.transition || 'fade', duration: number = this.options.duration || 500): Promise<void> {
+  open(transition?: DisclosureTransitionType, duration: number = this.options.duration ?? 500): Promise<void> {
+    const durationMs = Math.max(0, duration);
+    const t = transition ?? this.options.transition ?? 'fade';
     if (!this._isOpen && !this._isOpening) {
-      // console.log('Disclosure open', transition, duration);
-
       if (this._isAnimating && this._animation) {
         this._animation.pause();
       }
@@ -177,26 +170,26 @@ export default class Disclosure {
         });
 
         this.content.dispatchEvent(new CustomEvent('disclosure:open'));
+        this.options.onAfterOpen?.();
       };
 
       return new Promise<void>((resolve) => {
-        this.options.onOpen?.();
+        this.options.onBeforeOpen?.();
         this.content.setAttribute('aria-hidden', 'false');
         this._isOpen = true;
         this.triggers.forEach((trigger) => {
           trigger.setExpanded(true);
         });
 
-        const transitionInstance = this.createTransitionInstance(transition);
+        const transitionInstance = this.createTransitionInstance(t);
         if (transitionInstance) {
           const keyframes = transitionInstance.getKeyframesOpen();
 
           transitionInstance.beforeOpen();
           this._animation?.cancel();
-          this._animation = this.content!.animate(keyframes, { duration: duration, easing: 'ease-in-out', fill: 'forwards' });
+          this._animation = this.content!.animate(keyframes, { duration: durationMs, easing: 'ease-in-out', fill: 'forwards' });
           this._animation.finished
             .then(() => {
-              // console.log('open end');
               transitionInstance.afterOpen();
               this._isOpening = false;
               handleOpen();
@@ -204,8 +197,6 @@ export default class Disclosure {
               resolve();
             })
             .catch(() => {
-              // console.log('open stop');
-              // transitionInstance.afterOpen();
               resolve();
             });
         } else {
@@ -219,10 +210,10 @@ export default class Disclosure {
     return Promise.resolve();
   }
 
-  close(transition: string = this.options.transition || 'fade', duration: number = this.options.duration || 500): Promise<void> {
+  close(transition?: DisclosureTransitionType, duration: number = this.options.duration ?? 500): Promise<void> {
+    const durationMs = Math.max(0, duration);
+    const t = transition ?? this.options.transition ?? 'fade';
     if (this._isOpen && !this._isClosing) {
-      // console.log('Disclosure close', transition, this.options.transition, duration, this.id);
-
       if (this._isAnimating && this._animation) {
         // this._animation.finish();
         this._animation.pause();
@@ -246,25 +237,25 @@ export default class Disclosure {
         });
 
         this.content.dispatchEvent(new CustomEvent('disclosure:close'));
+        this.options.onAfterClose?.();
       };
 
       return new Promise<void>((resolve) => {
-        this.options.onClose?.();
+        this.options.onBeforeClose?.();
 
         this.triggers.forEach((trigger) => {
           trigger.setExpanded(false);
         });
 
-        const transitionInstance = this.createTransitionInstance(transition);
+        const transitionInstance = this.createTransitionInstance(t);
         if (transitionInstance) {
           const keyframes = transitionInstance.getKeyframesClose();
 
           transitionInstance.beforeClose();
           this._animation?.cancel();
-          this._animation = this.content!.animate(keyframes, { duration: duration, easing: 'ease-in-out', fill: 'forwards' });
+          this._animation = this.content!.animate(keyframes, { duration: durationMs, easing: 'ease-in-out', fill: 'forwards' });
           this._animation.finished
             .then(() => {
-              // console.log('close end');
               transitionInstance.afterClose();
               this._isClosing = false;
 
@@ -274,8 +265,6 @@ export default class Disclosure {
               resolve();
             })
             .catch(() => {
-              // console.log('close stop');
-              // transitionInstance.afterClose();
               resolve();
             });
         } else {
@@ -290,16 +279,18 @@ export default class Disclosure {
   }
 
   toggle() {
-    // console.log('Disclosure toggle');
-    this._isOpen ? this.close() : this.open();
+    if (this._isOpen) {
+      this.close();
+    } else {
+      this.open();
+    }
   }
 
   addTrigger(trigger: HTMLElement) {
-    // console.log('Disclosure addTrigger');
     this.triggers.push(this.initTrigger(trigger));
   }
 
-  on(event: 'onOpen' | 'onClose', callback: () => void) {
+  on(event: 'onBeforeOpen' | 'onAfterOpen' | 'onBeforeClose' | 'onAfterClose', callback: () => void) {
     this.options[event] = callback;
   }
 
@@ -330,7 +321,10 @@ export default class Disclosure {
   }
 
   destroy() {
-    // console.log('Disclosure destroy');
+    // commitStyles() は要素が未描画だと InvalidStateError を投げるため、破棄時は cancel とスタイル削除のみ行う
+    this._animation?.cancel();
+    this.removeStyles();
+    this._animation = null;
 
     this.content.removeAttribute('id');
     this.content.removeAttribute('aria-hidden');

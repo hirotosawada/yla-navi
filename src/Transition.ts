@@ -96,8 +96,9 @@ export class FoldingTransition extends Transition {
 
     const firstChild = this.content.firstElementChild as HTMLElement;
     const heightInner = firstChild ? firstChild.scrollHeight : this.content.scrollHeight;
+    const currentHeight = Math.ceil(parseFloat(currentStyle.height));
 
-    if (parseInt(currentStyle.height) > 0 && parseInt(currentStyle.height) < heightInner) {
+    if (currentHeight > 0 && currentHeight < heightInner) {
       keyframe = { height: currentStyle.height };
       // keyframe = { height: currentStyle.height, opacity: 0 };
     }
@@ -266,8 +267,9 @@ export class FadeFoldingTransition extends Transition {
 
     const firstChild = this.content.firstElementChild as HTMLElement;
     const heightInner = firstChild ? firstChild.scrollHeight : this.content.scrollHeight;
+    const currentHeight = Math.ceil(parseFloat(currentStyle.height));
 
-    if (parseInt(currentStyle.height) > 0 && parseInt(currentStyle.height) < heightInner) {
+    if (currentHeight > 0 && currentHeight < heightInner) {
       keyframe = { height: currentStyle.height, opacity: currentStyle.opacity };
     }
 
@@ -278,7 +280,7 @@ export class FadeFoldingTransition extends Transition {
     const currentStyle = getComputedStyle(this.content);
     let keyframe: Keyframe = this.keyFrameDefault.open;
 
-    keyframe = { height: currentStyle.height, opacity: currentStyle.opacity  };
+    keyframe = { height: currentStyle.height, opacity: currentStyle.opacity };
 
     return [keyframe, this.keyFrameDefault.close];
   }
@@ -295,6 +297,5 @@ export class FadeFoldingTransition extends Transition {
   }
   afterClose() {
     this.content.style.overflow = '';
-
   }
 }

@@ -1,12 +1,20 @@
+/** Disclosure で利用できるトランジション名。open/close の引数やオプションで指定する。 */
+export type DisclosureTransitionType = '' | 'none' | 'fade' | 'folding' | 'fadeFolding' | 'slideTop' | 'slideBottom' | 'slideLeft' | 'slideRight';
+
+/** 利用可能なトランジション一覧（UIのセレクト候補やドキュメント用）。 */
+export const DISCLOSURE_TRANSITION_TYPES: readonly DisclosureTransitionType[] = ['', 'none', 'fade', 'folding', 'fadeFolding', 'slideTop', 'slideBottom', 'slideLeft', 'slideRight'] as const;
+
 export interface DisclosureOptions {
   click?: boolean;
   focus?: boolean;
   enter?: boolean;
   leave?: boolean;
-  onOpen?: () => void;
-  onClose?: () => Promise<void> | void;
+  onBeforeOpen?: () => void;
+  onAfterOpen?: () => void;
+  onBeforeClose?: () => void;
+  onAfterClose?: () => void;
 
-  transition?: string;
+  transition?: DisclosureTransitionType;
   duration?: number;
 }
 
@@ -20,81 +28,40 @@ export interface TriggerOptions {
   enter?: boolean;
 }
 
-export interface MenuItemOptions extends DisclosureOptions {
+export interface ValikkoItemOptions extends DisclosureOptions {
   item?: string;
-  term?: string;
+  /** 開閉のきっかけになる要素のセレクタ（.valikko-trigger など）。 */
+  trigger?: string;
   child?: string;
 
-  isCloseChildren?: boolean; // 子を閉じないとかありえる？
+  isCloseChildren?: boolean;
   isCloseSiblings?: boolean;
 }
 
-export interface MenuOptions extends Omit<MenuItemOptions, 'transition'> {
-  type?: string;
+/** トップ階層とネストで別々に指定するときの形。 */
+export interface ValikkoTransitionTopUnder {
+  top?: DisclosureTransitionType;
+  under?: DisclosureTransitionType;
 }
 
-export interface NaviOptions {
+/** 全階層同じなら文字列、トップとネストで分けたいなら { top, under }。 */
+export type ValikkoTransitionOption = DisclosureTransitionType | ValikkoTransitionTopUnder;
+
+export interface ValikkoOptions extends Omit<ValikkoItemOptions, 'transition'> {
+  /** 省略時は 'folding'。{ top, under } で階層ごとに指定可能。 */
+  transition?: ValikkoTransitionOption;
+}
+
+export interface YlaOptions {
   selectorTrigger?: string;
   selectorOverlay?: string;
   selectorContent?: string;
   breakpoint?: number | null;
-  transition?: string;
+  transition?: DisclosureTransitionType;
   duration?: number;
   scroll?: {
     over?: number;
     up?: number;
     down?: number;
   };
-}
-
-// ========== ========== ========== ========== ==========
-export interface NaviOptions2 {
-  content?: string;
-  overlay?: string;
-  trigger?: string;
-
-  transition?: string;
-  duration?: number;
-
-  breakpoint?: number | null;
-}
-
-export interface DisclosureOptions2 {
-  onOpen?: () => void;
-  onClose?: () => Promise<void> | void;
-
-  transition?: string;
-  duration?: number;
-
-  isOpen?: {
-    click?: boolean;
-    focus?: boolean;
-    enter?: boolean;
-  };
-
-  isClose?: {
-    click?: boolean;
-    leave?: boolean;
-  };
-}
-
-export interface TriggerOptions2 {
-  onClick?: (event: MouseEvent) => void;
-  onFocus?: (event: FocusEvent) => void;
-  onMouseEnter?: (event: MouseEvent) => void;
-
-  isOpen?: {
-    click?: boolean;
-    focus?: boolean;
-    enter?: boolean;
-  };
-}
-
-export interface MenuItemOptions2 extends DisclosureOptions2 {
-  item?: string;
-  term?: string;
-  child?: string;
-
-  isCloseChildren?: boolean; // 子を閉じないとかありえる？
-  isCloseSiblings?: boolean;
 }
