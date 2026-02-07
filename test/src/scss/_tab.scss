@@ -1,0 +1,17 @@
+.tab {
+  &__body {
+    position: relative;
+
+    border: 1px solid;
+  }
+
+  &__body__item {
+    &[aria-hidden="true"] {
+      position: absolute;
+      top: 0;
+      left: 0;
+
+      width: 100%;
+    }
+  }
+}

@@ -1,4 +1,6 @@
-@use "./drawer.scss";
+@use "./navi";
+
+@use "./tab";
 
 $bp-menu: 768px;
 
@@ -18,7 +20,7 @@ body {
   z-index: 5;
 
   align-items: center;
-  padding: 0.5rem;
+  padding: 0;
 
   background: #fff;
 
@@ -34,7 +36,7 @@ body {
 }
 
 @media screen and (width <= $bp-menu) {
-  .drawer {
+  .navi {
     position: fixed;
     top: 0;
 
@@ -73,7 +75,7 @@ body {
     }
 
     &__nav {
-      .nav--drawer {
+      .nav--navi {
         margin: 0;
 
         list-style: none;
@@ -104,7 +106,7 @@ body {
 }
 
 @media screen and (width > 768px) {
-  .nav--drawer {
+  .nav--navi {
     display: flex;
     gap: 0.5em;
 
@@ -113,9 +115,9 @@ body {
     list-style: none;
   }
 
-  .drawer__head,
-  .drawer__foot,
-  .btn--drawer--open {
+  .navi__head,
+  .navi__foot,
+  .btn--navi--open {
     display: none;
   }
 }
@@ -132,14 +134,14 @@ body {
   }
 }
 
-.menu {
-  &__child {
+.valikko {
+  &-child {
     // overflow: hidden;
   }
 }
 
 @media screen and (width <= $bp-menu) {
-  .menu {
+  .valikko {
     background: #f0f0f0;
 
     &,
@@ -156,11 +158,11 @@ body {
       }
     }
 
-    &__item {
+    &-item {
       position: relative;
     }
 
-    &__term {
+    &-trigger {
       display: block;
       padding: 0.5rem 1rem;
 
@@ -172,7 +174,7 @@ body {
       }
     }
 
-    &__child {
+    &-child {
       // position: absolute;
       top: 0;
       left: 100%;
@@ -188,7 +190,7 @@ body {
 
 @media screen and (width > $bp-menu) {
   // メニューバー
-  .menu {
+  .valikko {
     display: flex;
     width: fit-content;
 
@@ -208,11 +210,11 @@ body {
       }
     }
 
-    &__item {
-      position: relative;
+    &-item {
+      // position: relative;
     }
 
-    &__term {
+    &-trigger {
       display: block;
       padding: 0.5rem 1rem;
 
@@ -224,18 +226,21 @@ body {
       }
     }
 
-    &__child {
+    &-child {
       position: absolute;
-      top: 0;
-      left: 100%;
+
+      // top: 0;
+      // left: 100%;
 
       background: #fff;
       box-shadow: 3px 3px 10px rgb(0 0 0/20%);
     }
 
-    > .menu__item > .menu__child {
+    > .valikko-item > .valikko-child {
       top: 100%;
       left: 0;
+
+      width: 100%;
     }
   }
 }

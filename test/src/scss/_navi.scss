@@ -1,0 +1,40 @@
+// ========== ========== ========== ========== ==========
+// core
+.navi {
+  &__overlay {
+    position: fixed;
+    inset: 0;
+  }
+
+  &[aria-hidden="true"] {
+    display: none;
+  }
+
+  &[aria-hidden="false"] {
+    .navi {
+      &__content {
+        overflow: auto;
+      }
+    }
+  }
+
+  // Navi テスト用（navi.html）
+  &__menu {
+    margin: 0;
+    padding: 1rem;
+    list-style: none;
+
+    a {
+      display: block;
+      padding: 0.5rem 0;
+    }
+  }
+}
+
+body.yla-scrolllocked {
+  position: fixed;
+
+  width: 100%;
+
+  overflow: hidden;
+}

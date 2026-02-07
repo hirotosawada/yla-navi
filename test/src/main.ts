@@ -1,23 +1,32 @@
-import { Drawer, Menu } from '../../src/drawer-menu.ts';
+import './scss/style.scss';
+
+import Disclosure from '../../src/Disclosure.ts';
+import Yla, { Valikko } from '../../src/main.ts';
+
+// import Tab from '../../src/Tab.ts';
 
 document.addEventListener('DOMContentLoaded', function () {
   const breakpoint = 768;
 
-  const drawer = new Drawer(document.querySelector('.drawer'), { transition: 'slideRight', duration: 200, breakpoint });
+  const yla = new Yla(document.querySelector('.navi'), { transition: 'slideTop', breakpoint });
 
+  document.querySelectorAll('.valikko-item').forEach((item) => {
+    item.addEventListener('click', () => {});
+  });
   // ========== ========== ========== ========== ==========
 
-  const menu = new Menu(document.querySelector('.menu'));
+  const valikko = new Valikko(document.querySelector('.valikko'));
+  // valikko.setOptions({ transition: 'folding', click: true, focus: true, enter: false, leave: false, isCloseSiblings: true });
 
   const changeMediaQuery = (event: MediaQueryListEvent) => {
-    menu.close('none');
+    valikko.close('none');
 
     if (event.matches) {
       console.log(`Viewport <= ${breakpoint}px`);
-      menu.setOptions({ transition: 'folding', click: true, focus: true, enter: false, leave: false, isCloseSiblings: false });
+      valikko.setOptions({ transition: 'folding', click: true, focus: true, enter: false, leave: false, isCloseSiblings: false });
     } else {
       console.log(`Viewport > ${breakpoint}px`);
-      menu.setOptions({ transition: 'dropdown', click: true, focus: true, enter: false, leave: false, isCloseSiblings: true });
+      valikko.setOptions({ transition: { top: 'fade', under: 'folding' }, click: true, focus: true, enter: true, leave: true, isCloseSiblings: true });
     }
   };
   const mediaQuery = window.matchMedia(`(max-width: ${breakpoint}px)`);
@@ -29,7 +38,11 @@ document.addEventListener('DOMContentLoaded', function () {
 
   // ========== ========== ========== ========== ==========
 
-  document.querySelector('.btn-close')?.addEventListener('click', () => {
-    menu.close('none');
-  });
+  // document.querySelector('.btn-close')?.addEventListener('click', () => {
+  //   valikko.close('none');
+  // });
+
+  new Disclosure(document.querySelector('.accordion__body'), document.querySelector('.accordion__trigger'));
+
+  // new Tab(document.querySelector('.tab'));
 });
