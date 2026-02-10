@@ -235,10 +235,10 @@ export default class Yla {
       this.overlay.style.display = 'block';
       this.overlay.animate(this.overlayAnime.fade, { duration: this.options.duration });
     }
+    this.scrollLock();
   }
 
   private onAfterOpen() {
-    this.scrollLock();
     document.addEventListener('keydown', this.handleFocusTrap);
     this.container!.dispatchEvent(new CustomEvent('yla:open'));
   }
@@ -251,12 +251,12 @@ export default class Yla {
         this.overlay!.style.display = 'none';
       });
     }
+    this.scrollUnlock();
   }
 
   private onAfterClose() {
     document.removeEventListener('keydown', this.handleFocusTrap);
     (document.activeElement as HTMLElement)?.blur();
-    this.scrollUnlock();
     this.container!.dispatchEvent(new CustomEvent('yla:close'));
   }
 
