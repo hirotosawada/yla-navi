@@ -86,6 +86,14 @@ export class FadeTransition extends Transition {
   }
 }
 
+/** 要素の scrollHeight に上下マージンを加えた高さを返す */
+function getHeightWithMargin(el: HTMLElement): number {
+  const style = getComputedStyle(el);
+  const marginTop = parseFloat(style.marginTop) || 0;
+  const marginBottom = parseFloat(style.marginBottom) || 0;
+  return el.scrollHeight + marginTop + marginBottom;
+}
+
 export class FoldingTransition extends Transition {
   keyFrameDefault = { open: { height: 'auto' }, close: { height: '0px' } };
   // keyFrameDefault = { open: { height: 'auto', opacity: 1 }, close: { height: '0px', opacity: 0 } };
@@ -95,7 +103,7 @@ export class FoldingTransition extends Transition {
     let keyframe: Keyframe = this.keyFrameDefault.close;
 
     const firstChild = this.content.firstElementChild as HTMLElement;
-    const heightInner = firstChild ? firstChild.scrollHeight : this.content.scrollHeight;
+    const heightInner = firstChild ? getHeightWithMargin(firstChild) : getHeightWithMargin(this.content);
     const currentHeight = Math.ceil(parseFloat(currentStyle.height));
 
     if (currentHeight > 0 && currentHeight < heightInner) {
