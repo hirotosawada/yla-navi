@@ -8,7 +8,8 @@ import { DisclosureTransitionType, YlaOptions } from './type';
 export default class Yla {
   // DOM
   private container: HTMLElement | null = null;
-  private content: HTMLElement | null = null;
+  private navi: HTMLElement | null = null;
+  // private content: HTMLElement | null = null; // 実はほとんど使われない
   private overlay: HTMLElement | null = null;
   private trigger: NodeListOf<HTMLElement>;
   private anchors: NodeListOf<HTMLAnchorElement> = [] as unknown as NodeListOf<HTMLAnchorElement>;
@@ -24,6 +25,7 @@ export default class Yla {
   private handleKeydownEsc: (event: KeyboardEvent) => void = () => {};
   private handleChangeMediaQuery: (event: MediaQueryListEvent) => void = () => {};
   private handleOnScroll: () => void = () => {};
+  private handleOnLeaveContainer: (event: MouseEvent) => void = () => {};
 
   // ステータス
   private isInit: boolean = false;
@@ -42,7 +44,7 @@ export default class Yla {
   private optionsDefault: Required<YlaOptions> = {
     selectorTrigger: '.yla-trigger',
     selectorOverlay: '.yla-overlay',
-    selectorContent: '.yla-content',
+    selectorNavi: '.yla-navi',
     breakpoint: null,
 
     transition: 'fade',
@@ -60,19 +62,20 @@ export default class Yla {
 
     this.container = container;
     this.container?.classList.add('yla-init');
+    this.navi = this.container?.querySelector<HTMLElement>(this.options.selectorNavi) ?? this.container ?? null;
     this.overlay = document.querySelector<HTMLElement>(this.options.selectorOverlay);
     if (this.overlay) this.overlay.style.display = 'none';
 
-    this.content = document.querySelector<HTMLElement>(this.options.selectorContent);
     this.trigger = document.querySelectorAll<HTMLElement>(this.options.selectorTrigger);
 
-    this.isInit = !!this.container && !!this.content && this.trigger.length > 0;
+    // this.isInit = !!this.container && !!this.navi && !!this.content && this.trigger.length > 0;
+    this.isInit = !!this.container && !!this.navi && this.trigger.length > 0;
 
     if (!this.isInit) {
       throw new Error('Yla: Not found element');
     }
 
-    this.disclosure = new Disclosure(this.container, this.trigger, {
+    this.disclosure = new Disclosure(this.navi, this.trigger, {
       onBeforeOpen: this.onBeforeOpen.bind(this),
       onAfterOpen: this.onAfterOpen.bind(this),
       onBeforeClose: this.onBeforeClose.bind(this),
@@ -81,8 +84,8 @@ export default class Yla {
       duration: this.options.duration,
     });
 
-    this.anchors = this.container!.querySelectorAll<HTMLAnchorElement>('a[href^="#"]');
-    this.focusable = this.container!.querySelectorAll<HTMLElement>('a, button, input, textarea, select, [tabindex]:not([tabindex="-1"])');
+    this.anchors = this.navi!.querySelectorAll<HTMLAnchorElement>('a[href^="#"]');
+    this.focusable = this.navi!.querySelectorAll<HTMLElement>('a, button, input, textarea, select, [tabindex]:not([tabindex="-1"])');
 
     this.initializeEventHandlers();
     this.addEvents();
@@ -98,9 +101,11 @@ export default class Yla {
     this.handleChangeMediaQuery = this.changeMediaQuery.bind(this);
 
     this.handleOnScroll = this.onScroll.bind(this);
+    this.handleOnLeaveContainer = this.onLeaveContainer.bind(this);
   }
 
   private addEvents() {
+    this.container?.addEventListener('mouseleave', this.handleOnLeaveContainer);
     this.overlay?.addEventListener('click', this.handleClickOverlay);
     this.anchors.forEach((anchor) => {
       anchor.addEventListener('click', this.handleClickAnchor);
@@ -120,6 +125,7 @@ export default class Yla {
   }
 
   private removeEvents() {
+    this.container?.removeEventListener('mouseleave', this.handleOnLeaveContainer);
     this.overlay?.removeEventListener('click', this.handleClickOverlay);
     this.anchors.forEach((anchor) => {
       anchor.removeEventListener('click', this.handleClickAnchor);
@@ -142,6 +148,10 @@ export default class Yla {
 
       this.container!.dispatchEvent(new CustomEvent('yla:anchor', { detail: { event } }));
     }
+  }
+
+  private onLeaveContainer() {
+    this.container?.dispatchEvent(new CustomEvent('yla:leave'));
   }
 
   private keydownEsc(event: KeyboardEvent) {
@@ -227,7 +237,7 @@ export default class Yla {
     this.container!.classList.remove('yla-active');
     this.disclosure.setDisabled(true);
     this.disclosure.resetAnime();
-    // TODO: disclosureで、this.content.removeAttribute('aria-hidden'); しているが、メニューをsp、pcで使い回しているかどうかによって変わるかも。
+    // TODO: disclosure で開閉対象（navi）の aria-hidden を制御している。メニューを sp/pc で使い回す場合は要検討。
   }
 
   private onBeforeOpen() {
@@ -344,7 +354,7 @@ export default class Yla {
 
   /**
    * カスタムイベントのリスナーを登録する
-   * @param eventName - 'yla:open' | 'yla:close' | 'yla:anchor' | 'yla:changeMediaQuery' など
+   * @param eventName - 'yla:open' | 'yla:close' | 'yla:leave' | 'yla:anchor' | 'yla:changeMediaQuery' など
    * @param callback - 発火時に呼ばれる関数
    */
   on(eventName: string, callback: (event: Event) => void) {
@@ -373,7 +383,7 @@ export default class Yla {
       this.overlay.style.opacity = '';
     }
     this.container = null;
-    this.content = null;
+    this.navi = null;
     this.overlay = null;
     this.trigger = undefined as unknown as NodeListOf<HTMLElement>;
     this.anchors = undefined as unknown as NodeListOf<HTMLAnchorElement>;

@@ -65,8 +65,8 @@ export interface YlaOptions {
   selectorTrigger?: string;
   /** オーバーレイ要素のセレクタ。省略時 '.yla-overlay' */
   selectorOverlay?: string;
-  /** ドロワー本体（コンテンツ）のセレクタ。省略時 '.yla-content' */
-  selectorContent?: string;
+  /** 開閉対象のナビ要素のセレクタ。container 内で探し、無ければ container を使用。省略時 '.yla-navi' */
+  selectorNavi?: string;
   /** この幅(px)以上でドロワー無効、未満で有効。min-width で判定（Valikko の breakpoints と同一基準）。null で常時有効。 */
   breakpoint?: number | null;
   /** 開閉時のトランジション種別 */
