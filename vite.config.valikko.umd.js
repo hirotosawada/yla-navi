@@ -6,7 +6,7 @@ export default defineConfig({
     emptyOutDir: false,
     lib: {
       entry: resolve(__dirname, 'src/Valikko.ts'),
-      name: 'yla_navi',
+      name: 'Valikko',
       formats: ['umd'],
       fileName: () => 'valikko.min.js',
     },

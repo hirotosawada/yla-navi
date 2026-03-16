@@ -6,7 +6,7 @@ export default defineConfig({
     emptyOutDir: false,
     lib: {
       entry: resolve(__dirname, 'src/Yla.ts'),
-      name: 'yla_navi',
+      name: 'Yla',
       formats: ['umd'],
       fileName: () => 'yla.min.js',
     },
