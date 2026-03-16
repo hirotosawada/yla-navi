@@ -5,7 +5,7 @@ import Yla from '../../src/main.ts';
 
 import type { YlaOptions, DisclosureTransitionType } from '../../src/type';
 
-const container = document.querySelector<HTMLElement>('.navi');
+const container = document.querySelector<HTMLElement>('.header');
 const optionsForm = document.getElementById('yla-options');
 const applyButton = document.getElementById('yla-options-apply');
 
@@ -31,7 +31,7 @@ function getOptionsFromForm(): YlaOptions {
 }
 
 function createYla(opts: YlaOptions): Yla {
-  if (!container) throw new Error('Yla: container not found');
+  if (!container) throw new Error('Yla: header not found');
   const yla = new Yla(container, opts);
   const hamburger = document.querySelector<HTMLButtonElement>('.header__hamburger');
 

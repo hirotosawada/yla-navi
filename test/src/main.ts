@@ -8,7 +8,7 @@ import Yla, { Valikko } from '../../src/main.ts';
 document.addEventListener('DOMContentLoaded', function () {
   const breakpoint = 768;
 
-  const yla = new Yla(document.querySelector('.navi'), { transition: 'slideTop', breakpoint });
+  const yla = new Yla(document.querySelector('.header'), { transition: 'slideTop', breakpoint });
 
   document.querySelectorAll('.valikko-item').forEach((item) => {
     item.addEventListener('click', () => {});
