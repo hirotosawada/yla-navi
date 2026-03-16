@@ -1,11 +1,8 @@
 import Disclosure from './Disclosure';
 // ドロップダウン
 import {
-  DisclosureOptions,
-  DisclosureTransitionType,
-  ValikkoItemOptions,
-  ValikkoOptions,
-  ValikkoTransitionTopUnder,
+ DisclosureOptions, DisclosureTransitionType, ValikkoItemOptions, ValikkoOptions,
+ ValikkoTransitionTopUnder
 } from './type';
 
 const defaultValikkoOptions = {
@@ -30,9 +27,11 @@ type ValikkoResolvedOptions = typeof defaultValikkoOptions & ValikkoOptions;
  * .valikko-item / .valikko-trigger / .valikko-child の構造で多段メニューを開閉する。
  * breakpoints でレスポンシブにオプションを切り替え可能（min-width でマージ）。
  */
+export type ValikkoMenuItem = ValikkoItem | ValikkoItemTriggerOnly;
+
 export default class Valikko {
   container: HTMLElement;
-  menuItems: ValikkoItem[] = [];
+  menuItems: ValikkoMenuItem[] = [];
 
   options: ValikkoResolvedOptions;
 
@@ -61,9 +60,10 @@ export default class Valikko {
 
     items.forEach((item) => {
       const trigger = item.querySelector<HTMLElement>(this.options.trigger);
-      const content = item.querySelector<HTMLElement>(this.options.child);
+      if (!trigger) return;
 
-      if (content && trigger) {
+      const content = item.querySelector<HTMLElement>(this.options.child);
+      if (content) {
         const wrapper = document.createElement('div');
         wrapper.classList.add('valikko-child-inner');
         while (content.firstChild) {
@@ -73,12 +73,18 @@ export default class Valikko {
 
         const transition = this.getTransitionForItem(item);
         this.menuItems.push(new ValikkoItem(item, content, trigger, { ...this.options, transition }));
+      } else {
+        this.menuItems.push(new ValikkoItemTriggerOnly(item, trigger, [], { ...this.options }));
       }
     });
 
     this.menuItems.forEach((item) => {
-      item.siblings = this.getSiblings(item);
-      item.children = this.getChildren(item);
+      if (item instanceof ValikkoItem) {
+        item.siblings = this.getSiblingsAtLevel(item.container, item);
+        item.children = this.getChildren(item);
+      } else {
+        item.siblings = this.getSiblingsAtLevel(item.container);
+      }
     });
 
     this.handleOnLeave = this.onLeave.bind(this);
@@ -89,7 +95,9 @@ export default class Valikko {
         this.close('none');
         this.applyBreakpoints();
       };
-      const keys = Object.keys(this.optionsBreakpoints).map(Number).sort((a, b) => a - b);
+      const keys = Object.keys(this.optionsBreakpoints)
+        .map(Number)
+        .sort((a, b) => a - b);
       keys.forEach((key) => {
         const mq = window.matchMedia(`(min-width: ${key}px)`);
         this.mediaQueries.set(key, mq);
@@ -113,7 +121,9 @@ export default class Valikko {
 
   private onLeave(): void {
     if (!this.options.leave) return;
-    this.menuItems.forEach((item) => item.close());
+    this.menuItems.forEach((item) => {
+      if (item instanceof ValikkoItem) item.close();
+    });
   }
 
   /**
@@ -125,15 +135,15 @@ export default class Valikko {
     return containerEl.closest(this.options.child);
   }
 
-  /** 同じ親 content を持つ兄弟（自身を除く）。 */
-  private getSiblings(item: ValikkoItem): ValikkoItem[] {
-    const parentContent = this.getParentContent(item.container);
-    return this.menuItems.filter((m) => m !== item && this.getParentContent(m.container) === parentContent);
+  /** 同じ親 content を持つ兄弟 ValikkoItem。exclude を渡すとその要素を除く。 */
+  private getSiblingsAtLevel(containerEl: HTMLElement, exclude?: ValikkoItem): ValikkoItem[] {
+    const parentContent = this.getParentContent(containerEl);
+    return this.menuItems.filter((m): m is ValikkoItem => m instanceof ValikkoItem && this.getParentContent(m.container) === parentContent && (exclude === undefined || m !== exclude));
   }
 
   /** この item の content を親に持つ子アイテム。 */
   private getChildren(item: ValikkoItem): ValikkoItem[] {
-    return this.menuItems.filter((m) => this.getParentContent(m.container) === item.content);
+    return this.menuItems.filter((m): m is ValikkoItem => m instanceof ValikkoItem && this.getParentContent(m.container) === item.content);
   }
 
   /** トップ階層かネストかで transition から選ぶ。文字列なら全階層同じ、{ top, under } なら階層別。 */
@@ -155,8 +165,12 @@ export default class Valikko {
     this.options = { ...this.options, ...options } as ValikkoResolvedOptions;
 
     this.menuItems.forEach((item) => {
-      const transition = this.getTransitionForItem(item.container);
-      item.setOptions({ ...options, transition });
+      if (item instanceof ValikkoItem) {
+        const transition = this.getTransitionForItem(item.container);
+        item.setOptions({ ...options, transition });
+      } else {
+        item.setOptions(options);
+      }
     });
   }
 
@@ -165,7 +179,9 @@ export default class Valikko {
    * @param transition - この回だけ使うトランジション（省略時はオプションの transition）
    */
   close(transition?: DisclosureTransitionType) {
-    this.menuItems.forEach((item) => item.close(transition));
+    this.menuItems.forEach((item) => {
+      if (item instanceof ValikkoItem) item.close(transition);
+    });
   }
 
   /** イベントを外し、インスタンスを破棄する */
@@ -175,6 +191,67 @@ export default class Valikko {
     this.container.removeEventListener('mouseleave', this.handleOnLeave);
     this.menuItems.forEach((item) => item.destroy());
     this.menuItems = [];
+  }
+}
+
+/** valikko-child を持たない項目。トリガーに enter/focus したとき兄弟を閉じるだけ。Disclosure は継承しない。 */
+class ValikkoItemTriggerOnly {
+  container: HTMLElement;
+  trigger: HTMLElement;
+  siblings: ValikkoItem[] = [];
+  isCloseSiblings: boolean = true;
+  enter: boolean = true;
+  focus: boolean = true;
+
+  private handleMouseEnter: () => void;
+  private handleFocus: () => void;
+
+  constructor(container: HTMLElement, trigger: HTMLElement, siblings: ValikkoItem[], options: Pick<ValikkoOptions, 'isCloseSiblings' | 'enter' | 'focus'>) {
+    this.container = container;
+    this.trigger = trigger;
+    this.siblings = siblings;
+    this.isCloseSiblings = options.isCloseSiblings ?? true;
+    this.enter = options.enter ?? true;
+    this.focus = options.focus ?? true;
+
+    this.handleMouseEnter = this.onEnter.bind(this);
+    this.handleFocus = this.onFocus.bind(this);
+    if (this.enter) this.trigger.addEventListener('mouseenter', this.handleMouseEnter);
+    if (this.focus) this.trigger.addEventListener('focus', this.handleFocus);
+  }
+
+  private closeSiblings(): void {
+    if (!this.isCloseSiblings) return;
+    this.siblings.forEach((s) => s.close());
+  }
+
+  private onEnter(): void {
+    if (!this.enter) return;
+    this.closeSiblings();
+  }
+
+  private onFocus(): void {
+    if (!this.focus) return;
+    this.closeSiblings();
+  }
+
+  setOptions(options: Partial<Pick<ValikkoOptions, 'isCloseSiblings' | 'enter' | 'focus'>>): void {
+    if (options.isCloseSiblings !== undefined) this.isCloseSiblings = options.isCloseSiblings;
+    if (options.enter !== undefined) {
+      this.enter = options.enter;
+      this.trigger.removeEventListener('mouseenter', this.handleMouseEnter);
+      if (this.enter) this.trigger.addEventListener('mouseenter', this.handleMouseEnter);
+    }
+    if (options.focus !== undefined) {
+      this.focus = options.focus;
+      this.trigger.removeEventListener('focus', this.handleFocus);
+      if (this.focus) this.trigger.addEventListener('focus', this.handleFocus);
+    }
+  }
+
+  destroy(): void {
+    this.trigger.removeEventListener('mouseenter', this.handleMouseEnter);
+    this.trigger.removeEventListener('focus', this.handleFocus);
   }
 }
 
