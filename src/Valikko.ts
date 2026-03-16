@@ -64,12 +64,13 @@ export default class Valikko {
 
       const content = item.querySelector<HTMLElement>(this.options.child);
       if (content) {
-        const wrapper = document.createElement('div');
-        wrapper.classList.add('valikko-child-inner');
-        while (content.firstChild) {
-          wrapper.appendChild(content.firstChild);
-        }
-        content.appendChild(wrapper);
+        // 子要素をラップしてたけどスタイリングが直感的でなかったのでコメントアウト
+        // const wrapper = document.createElement('div');
+        // wrapper.classList.add('valikko-child-inner');
+        // while (content.firstChild) {
+        //   wrapper.appendChild(content.firstChild);
+        // }
+        // content.appendChild(wrapper);
 
         const transition = this.getTransitionForItem(item);
         this.menuItems.push(new ValikkoItem(item, content, trigger, { ...this.options, transition }));
