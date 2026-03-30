@@ -107,7 +107,7 @@ export class FoldingTransition extends Transition {
     // const currentHeight = Math.ceil(parseFloat(currentStyle.height));
     const keyframeEnd = { height: `${heightInner}px` };
 
-    console.log(keyframeStart, keyframeEnd);
+    // console.log(keyframeStart, keyframeEnd);
     return [keyframeStart, keyframeEnd];
   }
 
@@ -122,7 +122,7 @@ export class FoldingTransition extends Transition {
 
     keyframeStart = { height: `${heightInner}px` };
 
-    console.log(keyframeStart, keyframeEnd);
+    // console.log(keyframeStart, keyframeEnd);
     return [keyframeStart, keyframeEnd];
   }
 
@@ -131,10 +131,6 @@ export class FoldingTransition extends Transition {
   }
   afterOpen() {
     this.content.style.overflow = '';
-    // this.content.style.height = 'auto';
-
-    // this.content.style.opacity = '1';
-    // this.content.style.animation = 'none';
   }
 
   beforeClose() {
@@ -142,11 +138,9 @@ export class FoldingTransition extends Transition {
   }
   afterClose() {
     this.content.style.overflow = '';
-    // this.content.style.height = 'auto';
-
-    // this.content.style.opacity = '1';
   }
 }
+
 export class SlideTopTransition extends Transition {
   keyFrameDefault = { open: { transform: 'none' }, close: { transform: 'translateY(-100%)' } };
 
