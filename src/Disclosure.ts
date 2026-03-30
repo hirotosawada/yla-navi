@@ -52,7 +52,7 @@ export default class Disclosure {
     this.content = content;
     this.id = content.id || `disclosure-${Math.random().toString(36).substring(2, 11)}`;
     this.content.setAttribute('id', this.id);
-    this.content.setAttribute('aria-hidden', 'true');
+    this.applyInitialAriaFromContent();
 
     this.handleOnLeave = this.onLeave.bind(this);
     this.content.addEventListener('mouseleave', this.handleOnLeave);
@@ -69,7 +69,33 @@ export default class Disclosure {
     triggers?.forEach((trigger) => {
       this.triggers.push(this.initTrigger(trigger));
     });
+
+    if (this._isOpen) {
+      this.triggers.forEach((trigger) => {
+        trigger.setExpanded(true);
+      });
+    }
   }
+
+  /** HTML の aria-hidden があれば解釈し、なければ閉じた状態として true を付与する。 */
+  private applyInitialAriaFromContent() {
+    const raw = this.content.getAttribute('aria-hidden');
+    if (raw === null) {
+      this.content.setAttribute('aria-hidden', 'true');
+      this._isOpen = false;
+      return;
+    }
+    const v = raw.trim().toLowerCase();
+    if (v === 'false') {
+      this._isOpen = true;
+      return;
+    }
+    this._isOpen = false;
+    if (v !== 'true') {
+      this.content.setAttribute('aria-hidden', 'true');
+    }
+  }
+
   // ========== ========== ========== ========== ==========
   // Private methods
   private onLeave() {
