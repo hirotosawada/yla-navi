@@ -11,6 +11,11 @@ import Yla from './Yla';
 export default Yla;
 export { Valikko };
 
+if (typeof window !== 'undefined') {
+  (window as unknown as { Yla: typeof Yla; Valikko: typeof Valikko }).Yla = Yla;
+  (window as unknown as { Yla: typeof Yla; Valikko: typeof Valikko }).Valikko = Valikko;
+}
+
 /*
 [ts]
 import Yla, { Valikko } from '@local/navi';
@@ -20,11 +25,9 @@ const valikko = new Valikko();
 
 /*
 [umd]
-<script src="yla.min.js"></script>
+<script src="yla-bundle.min.js"></script>
 <script>
-  const Yla = window.drawer_menu.default;
-  const Valikko = window.drawer_menu.Valikko;
-  const yla = new Yla();
-  const valikko = new Valikko();
+  const yla = new Yla(container, options);
+  const valikko = new Valikko(container, options);
 </script>
 */
