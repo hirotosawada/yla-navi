@@ -179,7 +179,7 @@ export class SlideBottomTransition extends Transition {
 
     const translateY = this.decomposeMatrix(currentStyle.transform).translateY;
     if (translateY && translateY > 0) {
-      keyframe = { transform: `translatYX(${translateY}px)` };
+      keyframe = { transform: `translateY(${translateY}px)` };
     }
 
     return [keyframe, this.keyFrameDefault.open];
@@ -191,7 +191,7 @@ export class SlideBottomTransition extends Transition {
 
     const translateY = this.decomposeMatrix(currentStyle.transform).translateY;
     if (translateY && translateY > 0) {
-      keyframe = { transform: `translatYX(${translateY}px)` };
+      keyframe = { transform: `translateY(${translateY}px)` };
     }
 
     return [keyframe, this.keyFrameDefault.close];
