@@ -175,32 +175,43 @@ export default class Disclosure {
   open(transition?: DisclosureTransitionType, duration: number = this.options.duration ?? 500): Promise<void> {
     const durationMs = Math.max(0, duration);
     const t = transition ?? this.options.transition ?? 'fade';
+
     if (!this._isOpen && !this._isOpening) {
       if (this._isAnimating && this._animation) {
         this._animation.pause();
       }
 
-      this._isClosing = false;
-      this._isOpening = true;
-      this._isAnimating = true;
-      this.triggers.forEach((trigger) => {
-        trigger.setDisabled(true);
-      });
-
-      const handleOpen = () => {
+      const handleAfterOpen = () => {
+        this._isOpening = false;
         this._isAnimating = false;
+
+        // トリガーを有効化
         this.triggers.forEach((trigger) => {
           trigger.setDisabled(false);
         });
 
-        this.content.dispatchEvent(new CustomEvent('disclosure:open'));
+        // コールバック実行
         this.options.onAfterOpen?.();
+
+        // イベント発火
+        this.content.dispatchEvent(new CustomEvent('disclosure:open'));
       };
 
       return new Promise<void>((resolve) => {
+        // 処理中はトリガーを無効化
+        this.triggers.forEach((trigger) => {
+          trigger.setDisabled(true);
+        });
+
+        // コールバック実行
         this.options.onBeforeOpen?.();
-        this.content.setAttribute('aria-hidden', 'false');
+
+        // 開閉ステータス更新
+        this._isClosing = false;
+        this._isOpening = true;
+        this._isAnimating = true;
         this._isOpen = true;
+        this.content.setAttribute('aria-hidden', 'false');
         this.triggers.forEach((trigger) => {
           trigger.setExpanded(true);
         });
@@ -215,8 +226,7 @@ export default class Disclosure {
           this._animation.finished
             .then(() => {
               transitionInstance.afterOpen();
-              this._isOpening = false;
-              handleOpen();
+              handleAfterOpen();
               this.resetAnime();
               resolve();
             })
@@ -225,48 +235,56 @@ export default class Disclosure {
             });
         } else {
           this._animation?.cancel();
-          handleOpen();
+          handleAfterOpen();
           resolve();
         }
       });
     }
 
+    //
     return Promise.resolve();
   }
 
   close(transition?: DisclosureTransitionType, duration: number = this.options.duration ?? 500): Promise<void> {
     const durationMs = Math.max(0, duration);
     const t = transition ?? this.options.transition ?? 'fade';
+
     if (this._isOpen && !this._isClosing) {
       if (this._isAnimating && this._animation) {
-        // this._animation.finish();
         this._animation.pause();
       }
 
-      this._isClosing = true;
-      this._isOpening = false;
-
-      this._isAnimating = true;
-      this.triggers.forEach((trigger) => {
-        trigger.setDisabled(true);
-      });
-
-      const handleClose = () => {
+      const handleAfterClose = () => {
         this._isOpen = false;
+        this._isClosing = false;
+        this._isAnimating = false;
         this.content.setAttribute('aria-hidden', 'true');
 
-        this._isAnimating = false;
+        // トリガーを有効化
         this.triggers.forEach((trigger) => {
           trigger.setDisabled(false);
         });
 
-        this.content.dispatchEvent(new CustomEvent('disclosure:close'));
+        // コールバック実行
         this.options.onAfterClose?.();
+
+        // イベント発火
+        this.content.dispatchEvent(new CustomEvent('disclosure:close'));
       };
 
       return new Promise<void>((resolve) => {
+        // 処理中はトリガーを無効化
+        this.triggers.forEach((trigger) => {
+          trigger.setDisabled(true);
+        });
+
+        // コールバック実行
         this.options.onBeforeClose?.();
 
+        // 開閉ステータス更新
+        this._isClosing = true;
+        this._isOpening = false;
+        this._isAnimating = true;
         this.triggers.forEach((trigger) => {
           trigger.setExpanded(false);
         });
@@ -281,11 +299,8 @@ export default class Disclosure {
           this._animation.finished
             .then(() => {
               transitionInstance.afterClose();
-              this._isClosing = false;
-
-              handleClose();
+              handleAfterClose();
               this.resetAnime();
-
               resolve();
             })
             .catch(() => {
@@ -293,7 +308,7 @@ export default class Disclosure {
             });
         } else {
           this._animation?.cancel();
-          handleClose();
+          handleAfterClose();
           resolve();
         }
       });

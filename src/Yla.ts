@@ -246,11 +246,13 @@ export default class Yla {
       this.overlay.animate(this.overlayAnime.fade, { duration: this.options.duration });
     }
     this.scrollLock();
+    this.container!.dispatchEvent(new CustomEvent('yla:beforeOpen'));
   }
 
   private onAfterOpen() {
     document.addEventListener('keydown', this.handleFocusTrap);
-    this.container!.dispatchEvent(new CustomEvent('yla:open'));
+    this.container!.dispatchEvent(new CustomEvent('yla:afterOpen'));
+    this.container!.dispatchEvent(new CustomEvent('yla:open')); // 互換性のために残す。いずれ削除する
   }
 
   private onBeforeClose() {
@@ -262,12 +264,14 @@ export default class Yla {
       });
     }
     this.scrollUnlock();
+    this.container!.dispatchEvent(new CustomEvent('yla:beforeClose'));
   }
 
   private onAfterClose() {
     document.removeEventListener('keydown', this.handleFocusTrap);
     (document.activeElement as HTMLElement)?.blur();
-    this.container!.dispatchEvent(new CustomEvent('yla:close'));
+    this.container!.dispatchEvent(new CustomEvent('yla:afterClose'));
+    this.container!.dispatchEvent(new CustomEvent('yla:close')); // 互換性のために残す。いずれ削除する
   }
 
   // ---------- ----------
@@ -354,8 +358,12 @@ export default class Yla {
 
   /**
    * カスタムイベントのリスナーを登録する
-   * @param eventName - 'yla:open' | 'yla:close' | 'yla:leave' | 'yla:anchor' | 'yla:changeMediaQuery' など
-   * @param callback - 発火時に呼ばれる関数
+   *
+   * @param eventName - 次のいずれか（`container` にバブルする）
+   * - 開閉フェーズ: `yla:beforeOpen`（オーバーレイ表示・`scrollLock` 直後）, `yla:afterOpen`（フォーカストラップ登録直後）, `yla:beforeClose`（`scrollUnlock` 直後）, `yla:afterClose`（フォーカストラップ解除・`blur` 直後）
+   * - 互換: `yla:open`（`yla:afterOpen` と同タイミング）, `yla:close`（`yla:afterClose` と同タイミング）
+   * - その他: `yla:leave`, `yla:anchor`, `yla:changeMediaQuery`, `yla:scrolldown`, `yla:scrollup`
+   * @param callback - 発火時に呼ばれる関数（`yla:anchor` のみ `click` の `MouseEvent` が渡る）
    */
   on(eventName: string, callback: (event: Event) => void) {
     if (eventName === 'yla:anchor') {
