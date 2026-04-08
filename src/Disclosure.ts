@@ -77,22 +77,36 @@ export default class Disclosure {
     }
   }
 
-  /** HTML の aria-hidden があれば解釈し、なければ閉じた状態として true を付与する。 */
+  /**
+   * コンストラクタ時に、`content` の `aria-hidden` を読み `_isOpen` と `style.display` を初期化する。
+   *
+   * - 属性なし: `aria-hidden="true"` を付与し、閉じた扱い（`display: none`）。
+   * - `"false"`（前後の空白は無視、大文字小文字は無視）: 開いた扱い（`display` は空文字で既定の表示に委ねる）。
+   * - `"true"`: 閉じた扱い（`display: none`）。属性はそのまま。
+   * - 上記以外の不正な値: `aria-hidden="true"` に正規化し、閉じた扱い（`display: none`）。
+   */
   private applyInitialAriaFromContent() {
-    const raw = this.content.getAttribute('aria-hidden');
-    if (raw === null) {
+    const initialAria = this.content.getAttribute('aria-hidden');
+    if (initialAria === null) {
       this.content.setAttribute('aria-hidden', 'true');
       this._isOpen = false;
+      this.content.style.display = 'none';
       return;
     }
-    const v = raw.trim().toLowerCase();
-    if (v === 'false') {
+    const initialAriaValue = initialAria.trim().toLowerCase();
+    if (initialAriaValue === 'false') {
       this._isOpen = true;
+      this.content.style.display = '';
       return;
-    }
-    this._isOpen = false;
-    if (v !== 'true') {
+    } else if (initialAriaValue !== 'true') {
+      // 値が不正な場合は true を付与して閉じた状態とする
       this.content.setAttribute('aria-hidden', 'true');
+      this._isOpen = false;
+      this.content.style.display = 'none';
+      return;
+    } else {
+      this._isOpen = false;
+      this.content.style.display = 'none';
     }
   }
 
@@ -212,6 +226,7 @@ export default class Disclosure {
         this._isAnimating = true;
         this._isOpen = true;
         this.content.setAttribute('aria-hidden', 'false');
+        this.content.style.display = ''; // 初期値はブラウザ依存
         this.triggers.forEach((trigger) => {
           trigger.setExpanded(true);
         });
@@ -259,6 +274,7 @@ export default class Disclosure {
         this._isClosing = false;
         this._isAnimating = false;
         this.content.setAttribute('aria-hidden', 'true');
+        this.content.style.display = 'none';
 
         // トリガーを有効化
         this.triggers.forEach((trigger) => {
@@ -336,8 +352,10 @@ export default class Disclosure {
   setDisabled(isDisabled: boolean) {
     if (isDisabled) {
       this.content.removeAttribute('aria-hidden');
+      this.content.style.display = '';
     } else {
       this.content.setAttribute('aria-hidden', this._isOpen ? 'false' : 'true');
+      this.content.style.display = this._isOpen ? '' : 'none';
     }
 
     this.triggers.forEach((trigger) => {
@@ -367,6 +385,7 @@ export default class Disclosure {
 
     this.content.removeAttribute('id');
     this.content.removeAttribute('aria-hidden');
+    this.content.style.display = '';
 
     if (this.options.leave) {
       this.content.removeEventListener('mouseleave', this.handleOnLeave);
