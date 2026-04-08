@@ -13,7 +13,7 @@
           <ul class="valikko" id="valikko">
             <li class="valikko-item">
               <a href="#" class="valikko-trigger">メニュー１</a>
-              <div class="valikko-child">
+              <div class="valikko-child" aria-hidden="false">
                 <ul>
                   <li class="valikko-item"><a href="#" class="valikko-trigger">メニュー１−１</a></li>
                   <li class="valikko-item">
@@ -58,13 +58,15 @@
       </div>
     </header>
 
-    <main class="main main--valikko">
-      <p class="main__back"><a href="/">← 一覧に戻る</a></p>
-      <h1>Valikko テスト</h1>
-      <p>ドロップダウンメニュー（Valikko）のみ。Yla のドロワーは使っていません。</p>
-      <p>768px 以上で横並びメニュー＋ホバー/フォーカスで開閉、以下で縦積み＋クリックで開閉のスタイルになります。</p>
+    <main class="main">
+      <div class="content">
+        <p class="main__back"><a href="/">← 一覧に戻る</a></p>
+        <h1>Valikko テスト</h1>
+        <p>ドロップダウンメニュー（Valikko）のみ。Yla は不使用</p>
+        <p>768px 以上で横並びメニュー＋ホバー/フォーカスで開閉、以下で縦積み＋クリックで開閉のスタイルになります。</p>
+      </div>
     </main>
 
-    <script type="module" src="/src/valikko.ts"></script>
+    <script type="module" src="/src/valikko-test.ts"></script>
   </body>
 </html>

@@ -1,0 +1,14 @@
+// ========== ========== ========== ========== ==========
+// core Yla
+.yla-overlay {
+  position: fixed;
+  inset: 0;
+}
+
+body.yla-scrolllocked {
+  position: fixed;
+
+  width: 100%;
+
+  overflow: hidden;
+}

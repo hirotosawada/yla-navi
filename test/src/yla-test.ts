@@ -1,11 +1,12 @@
-import './scss/style.scss';
-import './scss/_yla-page.scss';
+import './scss/common.scss';
+import './scss/yla.scss';
+import './scss/yla-test.scss';
 
 import Yla from '../../src/main.ts';
 
-import type { YlaOptions, DisclosureTransitionType } from '../../src/type';
+import type { YlaOptions, DisclosureTransitionType } from '../../src/type.ts';
 
-const container = document.querySelector<HTMLElement>('.header');
+const container = document.querySelector<HTMLElement>('.yla');
 const optionsForm = document.getElementById('yla-options');
 const applyButton = document.getElementById('yla-options-apply');
 
@@ -33,11 +34,6 @@ function getOptionsFromForm(): YlaOptions {
 function createYla(opts: YlaOptions): Yla {
   if (!container) throw new Error('Yla: header not found');
   const yla = new Yla(container, opts);
-  const hamburger = document.querySelector<HTMLButtonElement>('.header__hamburger');
-
-  const updateHamburgerExpanded = () => {
-    hamburger?.setAttribute('aria-expanded', String(yla.isOpen));
-  };
 
   yla.on('yla:open', () => {
     console.log('[Yla] open');

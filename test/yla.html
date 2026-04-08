@@ -6,101 +6,105 @@
     <title>Yla テスト</title>
   </head>
   <body class="page-yla">
-    <header class="header header--sticky">
-      <div class="header__inner">
-        <a href="/" class="header__logo">logo</a>
+    <div class="yla-overlay" aria-hidden="true"></div>
+    <header class="header header--sticky yla">
+      <div class="header__body">
+        <div class="header__logo">
+          <a href="/">LOGO</a>
+        </div>
 
-        <nav class="navi yla-navi" id="navi" aria-label="メインナビゲーション">
-          <div class="navi__content">
-            <div class="navi__head">
-              <button type="button" class="navi__close btn--navi--close  yla-trigger" aria-label="メニューを閉じる">閉じる</button>
+        <div class="header__nav yla-navi">
+          <nav class="navi" aria-label="メインナビゲーション">
+            <div class="navi__content">
+              <div class="navi__body">
+                <ul class="navi__menu">
+                  <li><a href="#section-a" class="navi__link">セクションA</a></li>
+                  <li><a href="#section-b" class="navi__link">セクションB</a></li>
+                  <li><a href="#section-c" class="navi__link">セクションC</a></li>
+                </ul>
+              </div>
+              <div class="navi__foot">
+                <a href="#" class="navi__contact">お問い合わせ</a>
+              </div>
             </div>
-            <div class="navi__body">
-              <ul class="navi__menu">
-                <li><a href="#section-a" class="navi__link">セクションA</a></li>
-                <li><a href="#section-b" class="navi__link">セクションB</a></li>
-                <li><a href="#section-c" class="navi__link">セクションC</a></li>
-              </ul>
-            </div>
-            <div class="navi__foot">
-              <a href="#" class="navi__contact">お問い合わせ</a>
-            </div>
-          </div>
-        </nav>
+          </nav>
+        </div>
 
-        <button type="button" class="header__hamburger btn--navi--open navi__trigger yla-trigger" aria-label="メニューを開く" aria-expanded="false">
-          <span class="header__hamburger-bar"></span>
-          <span class="header__hamburger-bar"></span>
-          <span class="header__hamburger-bar"></span>
-        </button>
+        <div class="header__nav-trigger">
+          <button type="button" class="nav-trigger yla-trigger" aria-label="メニューを開く" aria-expanded="false">
+            <span class="nav-trigger__bar"></span>
+            <span class="nav-trigger__bar"></span>
+            <span class="nav-trigger__bar"></span>
+          </button>
+        </div>
       </div>
-
-      <div class="yla-overlay" aria-hidden="true"></div>
     </header>
 
     <main class="main">
-      <p class="main__back"><a href="/">← 一覧に戻る</a></p>
-      <h1>Yla テスト</h1>
-      <p>ブレークポイント 768px。PC は横並び追従ヘッダー、SP は全画面ハンバーガーメニューです。</p>
+      <div class="content">
+        <p class="main__back"><a href="/">← 一覧に戻る</a></p>
+        <h1>Yla テスト</h1>
+        <p>ブレークポイント 768px。PC は横並び追従ヘッダー、SP は全画面ハンバーガーメニューです。</p>
 
-      <section class="main__options" id="yla-options">
-        <h2>オプション</h2>
-        <div class="options-panel">
-          <div class="options-panel__row">
-            <label class="options-panel__label">
-              breakpoint
-              <input type="number" name="breakpoint" class="options-panel__input" value="768" placeholder="空で常時有効" min="0" step="1" />
-            </label>
-            <span class="options-panel__hint">px 以下でドロワー有効。空で常時有効</span>
+        <section class="main__options" id="yla-options">
+          <h2>オプション</h2>
+          <div class="options-panel">
+            <div class="options-panel__row">
+              <label class="options-panel__label">
+                breakpoint
+                <input type="number" name="breakpoint" class="options-panel__input" value="768" placeholder="空で常時有効" min="0" step="1" />
+              </label>
+              <span class="options-panel__hint">px 以下でドロワー有効。空で常時有効</span>
+            </div>
+            <div class="options-panel__row">
+              <label class="options-panel__label">
+                duration
+                <input type="number" name="duration" class="options-panel__input" value="600" min="0" step="50" />
+              </label>
+              <span class="options-panel__hint">ms</span>
+            </div>
+            <div class="options-panel__row">
+              <label class="options-panel__label">
+                transition
+                <select name="transition" class="options-panel__select">
+                  <option value="">なし</option>
+                  <option value="fade">fade</option>
+                  <option value="folding">folding</option>
+                  <option value="fadeFolding">fadeFolding</option>
+                  <option value="slideTop">slideTop</option>
+                  <option value="slideBottom">slideBottom</option>
+                  <option value="slideLeft">slideLeft</option>
+                  <option value="slideRight">slideRight</option>
+                </select>
+              </label>
+            </div>
+            <div class="options-panel__row options-panel__row--scroll">
+              <span class="options-panel__label">scroll</span>
+              <label class="options-panel__inline"> over <input type="number" name="scrollOver" class="options-panel__input options-panel__input--narrow" value="200" min="0" /> </label>
+              <label class="options-panel__inline"> up <input type="number" name="scrollUp" class="options-panel__input options-panel__input--narrow" value="0" min="0" /> </label>
+              <label class="options-panel__inline"> down <input type="number" name="scrollDown" class="options-panel__input options-panel__input--narrow" value="0" min="0" /> </label>
+            </div>
+            <div class="options-panel__row">
+              <button type="button" class="options-panel__apply" id="yla-options-apply">適用</button>
+            </div>
           </div>
-          <div class="options-panel__row">
-            <label class="options-panel__label">
-              duration
-              <input type="number" name="duration" class="options-panel__input" value="600" min="0" step="50" />
-            </label>
-            <span class="options-panel__hint">ms</span>
-          </div>
-          <div class="options-panel__row">
-            <label class="options-panel__label">
-              transition
-              <select name="transition" class="options-panel__select">
-                <option value="">なし</option>
-                <option value="fade">fade</option>
-                <option value="folding">folding</option>
-                <option value="fadeFolding">fadeFolding</option>
-                <option value="slideTop">slideTop</option>
-                <option value="slideBottom">slideBottom</option>
-                <option value="slideLeft">slideLeft</option>
-                <option value="slideRight">slideRight</option>
-              </select>
-            </label>
-          </div>
-          <div class="options-panel__row options-panel__row--scroll">
-            <span class="options-panel__label">scroll</span>
-            <label class="options-panel__inline"> over <input type="number" name="scrollOver" class="options-panel__input options-panel__input--narrow" value="200" min="0" /> </label>
-            <label class="options-panel__inline"> up <input type="number" name="scrollUp" class="options-panel__input options-panel__input--narrow" value="0" min="0" /> </label>
-            <label class="options-panel__inline"> down <input type="number" name="scrollDown" class="options-panel__input options-panel__input--narrow" value="0" min="0" /> </label>
-          </div>
-          <div class="options-panel__row">
-            <button type="button" class="options-panel__apply" id="yla-options-apply">適用</button>
-          </div>
-        </div>
-      </section>
+        </section>
 
-      <section id="section-a" class="main__section">
-        <h2>セクションA</h2>
-        <p>アンカーリンクでここに飛び、ドロワーが閉じることを確認。</p>
-      </section>
-      <section id="section-b" class="main__section">
-        <h2>セクションB</h2>
-        <p>同上。</p>
-      </section>
-      <section id="section-c" class="main__section">
-        <h2>セクションC</h2>
-        <p>同上。</p>
-      </section>
+        <section id="section-a" class="main__section">
+          <h2>セクションA</h2>
+          <p>アンカーリンクでここに飛び、ドロワーが閉じることを確認。</p>
+        </section>
+        <section id="section-b" class="main__section">
+          <h2>セクションB</h2>
+          <p>同上。</p>
+        </section>
+        <section id="section-c" class="main__section">
+          <h2>セクションC</h2>
+          <p>同上。</p>
+        </section>
+      </div>
     </main>
 
-    <script type="module" src="/src/yla.ts"></script>
+    <script type="module" src="/src/yla-test.ts"></script>
   </body>
 </html>

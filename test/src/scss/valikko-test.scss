@@ -1,0 +1,113 @@
+$bp-menu: 768px;
+
+// ========== ========== ========== ========== ==========
+.header {
+  position: sticky;
+  top: 0;
+  z-index: 5;
+
+  align-items: center;
+  padding: 0;
+
+  background: #fff;
+
+  &__inner {
+    display: flex;
+  }
+}
+
+@media screen and (width <= $bp-menu) {
+  .valikko {
+    background: #f0f0f0;
+
+    &,
+    ul {
+      margin: 0;
+      padding: 0;
+
+      list-style: none;
+    }
+
+    *[aria-expanded] {
+      &::after {
+        content: "＞";
+      }
+    }
+
+    &-item {
+      position: relative;
+    }
+
+    &-trigger {
+      display: block;
+      padding: 0.5rem 1rem;
+
+      white-space: nowrap;
+      word-break: keep-all;
+
+      &[aria-expanded="true"] {
+        background: #eee;
+      }
+    }
+
+    &-child {
+      top: 0;
+      left: 100%;
+
+      padding-left: 1rem;
+
+      overflow: hidden;
+
+      background: #fff;
+    }
+  }
+}
+
+@media screen and (width > $bp-menu) {
+  .valikko {
+    display: flex;
+    width: fit-content;
+
+    background: #f0f0f0;
+
+    &,
+    ul {
+      margin: 0;
+      padding: 0;
+
+      list-style: none;
+    }
+
+    *[aria-expanded] {
+      &::after {
+        content: "＞";
+      }
+    }
+
+    &-trigger {
+      display: block;
+      padding: 0.5rem 1rem;
+
+      white-space: nowrap;
+      word-break: keep-all;
+
+      &[aria-expanded="true"] {
+        background: #eee;
+      }
+    }
+
+    &-child {
+      position: absolute;
+
+      background: #fff;
+      box-shadow: 3px 3px 10px rgb(0 0 0/20%);
+    }
+
+    > .valikko-item > .valikko-child {
+      top: 100%;
+      left: 0;
+
+      width: 100%;
+    }
+  }
+}
