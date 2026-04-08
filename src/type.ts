@@ -60,6 +60,9 @@ export interface ValikkoOptions extends Omit<ValikkoItemOptions, 'transition'> {
   breakpoints?: ValikkoBreakpoints;
 }
 
+/** `scroll.over` / `up` / `down` に渡せる、固定値または毎回評価する閾値。 */
+export type YlaScrollThreshold = number | (() => number);
+
 export interface YlaOptions {
   /** 開閉トリガー要素のセレクタ。省略時 '.yla-trigger' */
   selectorTrigger?: string;
@@ -73,11 +76,14 @@ export interface YlaOptions {
   transition?: DisclosureTransitionType;
   /** アニメーション時間（ms） */
   duration?: number;
-  /** スクロール量に応じたクラス付与の閾値（over: この値超で yla-scrolled など） */
+  /**
+   * スクロール量に応じたクラス付与の閾値（over: この値超で yla-scrolled など）。
+   * 各キーは数値か、都度評価する関数（ビューポートやブレークポイントに応じたチューニング用）。
+   */
   scroll?: {
-    over?: number;
-    up?: number;
-    down?: number;
+    over?: YlaScrollThreshold;
+    up?: YlaScrollThreshold;
+    down?: YlaScrollThreshold;
   };
   /**
    * ドロワー表示中にスクロールを止める対象要素。`getBoundingClientRect` と `position: fixed` で固定する。

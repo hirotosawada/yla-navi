@@ -64,6 +64,10 @@ export default class Yla {
    */
   constructor(container: HTMLElement | null, options?: YlaOptions) {
     this.options = Object.assign({}, this.optionsDefault, options);
+    this.options.scroll = {
+      ...this.optionsDefault.scroll,
+      ...(options?.scroll ?? {}),
+    };
 
     this.container = container;
     this.container?.classList.add('yla-init');
@@ -183,6 +187,12 @@ export default class Yla {
     this.container!.dispatchEvent(new CustomEvent('yla:changeMediaQuery', { detail: { event } }));
   }
 
+  private getScrollThreshold(which: 'over' | 'up' | 'down'): number {
+    const fallbacks = { over: 200, up: 0, down: 0 } as const;
+    const raw = this.options.scroll[which] ?? fallbacks[which];
+    return typeof raw === 'function' ? raw() : raw;
+  }
+
   private onScroll() {
     if (!this.scrollTicking) {
       requestAnimationFrame(() => {
@@ -206,16 +216,16 @@ export default class Yla {
         this.scrollLast = currentScrollY;
 
         // スクロールのステータスをクラスに反映
-        document.documentElement.classList.toggle('yla-scrolled', currentScrollY > (this.options.scroll.over || 0));
+        document.documentElement.classList.toggle('yla-scrolled', currentScrollY > this.getScrollThreshold('over'));
         document.documentElement.classList.toggle('yla-scrolling-down', this.scrollBuffer > 0);
         document.documentElement.classList.toggle('yla-scrolling-up', this.scrollBuffer < 0);
 
         // イベント発火
         if (!this.scrollEventFired) {
-          if (this.scrollBuffer > (this.options.scroll.down || 0)) {
+          if (this.scrollBuffer > this.getScrollThreshold('down')) {
             this.container?.dispatchEvent(new CustomEvent('yla:scrolldown'));
             this.scrollEventFired = true;
-          } else if (this.scrollBuffer < -(this.options.scroll.up || 0)) {
+          } else if (this.scrollBuffer < -this.getScrollThreshold('up')) {
             this.container?.dispatchEvent(new CustomEvent('yla:scrollup'));
             this.scrollEventFired = true;
           }
