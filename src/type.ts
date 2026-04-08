@@ -79,4 +79,9 @@ export interface YlaOptions {
     up?: number;
     down?: number;
   };
+  /**
+   * ドロワー表示中にスクロールを止める対象要素。`getBoundingClientRect` と `position: fixed` で固定する。
+   * `null` のときはロックしない。省略時は `document.body`。
+   */
+  scrollLockTarget?: HTMLElement | null;
 }

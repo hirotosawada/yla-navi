@@ -9,7 +9,6 @@ export default class Yla {
   // DOM
   private container: HTMLElement | null = null;
   private navi: HTMLElement | null = null;
-  // private content: HTMLElement | null = null; // 実はほとんど使われない
   private overlay: HTMLElement | null = null;
   private trigger: NodeListOf<HTMLElement>;
   private anchors: NodeListOf<HTMLAnchorElement> = [] as unknown as NodeListOf<HTMLAnchorElement>;
@@ -30,7 +29,10 @@ export default class Yla {
   // ステータス
   private isInit: boolean = false;
   private isActive: boolean = false;
-  private currentScrollY: number = 0;
+  private savedWindowScrollY: number = 0;
+  private savedElementScrollTop: number = 0;
+  private savedWidth: string = '';
+  private isScrollLockActive: boolean = false;
   private mediaQuery: MediaQueryList | null = null;
 
   // 他
@@ -50,6 +52,7 @@ export default class Yla {
     transition: 'fade',
     duration: 600,
     scroll: { over: 200, up: 0, down: 0 },
+    scrollLockTarget: document.body,
   };
   private options: Required<YlaOptions>;
 
@@ -285,20 +288,53 @@ export default class Yla {
 
   // ---------- ----------
   private scrollLock() {
-    // スクロール位置固定
-    this.currentScrollY = window.scrollY;
-    document.body.style.width = getComputedStyle(document.body).width;
-    document.body.style.top = `-${this.currentScrollY}px`;
-    document.body.classList.add('yla-scrolllocked');
+    const target = this.options.scrollLockTarget;
+    if (target == null) return;
+
+    this.savedWindowScrollY = window.scrollY;
+    this.savedElementScrollTop = target.scrollTop;
+
+    // 常時表示スクロールバーが消えたときの幅ジャンプを抑える（ロック前に幅を計測）
+    const scrollbarWidth = Math.max(0, window.innerWidth - document.documentElement.clientWidth);
+    this.savedWidth = target.style.width;
+
+    const rect = target.getBoundingClientRect();
+    const computed = getComputedStyle(target);
+    const isDocRoot = target === document.body || target === document.documentElement;
+
+    target.style.position = 'fixed';
+    target.style.top = `${rect.top}px`;
+    // スクロールバー非表示でレイアウト幅が広がる場合は、ロック直前の描画幅（px）に固定する
+    target.style.width = scrollbarWidth > 0 ? `${rect.width}px` : computed.width;
+
+    if (!isDocRoot) {
+      target.style.left = `${rect.left}px`;
+      target.style.height = `${rect.height}px`;
+    } else {
+      target.style.left = '';
+      target.style.height = '';
+    }
+    target.style.overflow = 'hidden';
+    target.classList.add('yla-scrolllocked');
+
+    this.isScrollLockActive = true;
   }
 
   private scrollUnlock() {
-    // スクロール位置復元
-    document.body.style.top = '';
-    document.body.style.width = '';
-    document.body.classList.remove('yla-scrolllocked');
+    const target = this.options.scrollLockTarget;
+    if (target == null || !this.isScrollLockActive) return;
+    this.isScrollLockActive = false;
 
-    window.scrollTo({ top: this.currentScrollY, behavior: 'instant' });
+    target.style.position = '';
+    target.style.top = '';
+    target.style.left = '';
+    target.style.width = this.savedWidth;
+    target.style.height = '';
+    target.style.overflow = '';
+    target.classList.remove('yla-scrolllocked');
+
+    window.scrollTo({ top: this.savedWindowScrollY, behavior: 'instant' });
+    target.scrollTop = this.savedElementScrollTop;
   }
 
   private focusTrap(event: KeyboardEvent) {
@@ -360,7 +396,7 @@ export default class Yla {
    * カスタムイベントのリスナーを登録する
    *
    * @param eventName - 次のいずれか（`container` にバブルする）
-   * - 開閉フェーズ: `yla:beforeOpen`（オーバーレイ表示・`scrollLock` 直後）, `yla:afterOpen`（フォーカストラップ登録直後）, `yla:beforeClose`（`scrollUnlock` 直後）, `yla:afterClose`（フォーカストラップ解除・`blur` 直後）
+   * - 開閉フェーズ: `yla:beforeOpen`（オーバーレイ表示・`scrollLock` 直後。対象は `scrollLockTarget`）, `yla:afterOpen`（フォーカストラップ登録直後）, `yla:beforeClose`（`scrollUnlock` 直後）, `yla:afterClose`（フォーカストラップ解除・`blur` 直後）
    * - 互換: `yla:open`（`yla:afterOpen` と同タイミング）, `yla:close`（`yla:afterClose` と同タイミング）
    * - その他: `yla:leave`, `yla:anchor`, `yla:changeMediaQuery`, `yla:scrolldown`, `yla:scrollup`
    * @param callback - 発火時に呼ばれる関数（`yla:anchor` のみ `click` の `MouseEvent` が渡る）
