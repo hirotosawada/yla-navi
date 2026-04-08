@@ -29,11 +29,13 @@ export default class Yla {
   // ステータス
   private isInit: boolean = false;
   private isActive: boolean = false;
+  private mediaQuery: MediaQueryList | null = null;
+
+  // スクロールロック時の保存値
+  private isScrollLockActive: boolean = false;
   private savedWindowScrollY: number = 0;
   private savedElementScrollTop: number = 0;
   private savedWidth: string = '';
-  private isScrollLockActive: boolean = false;
-  private mediaQuery: MediaQueryList | null = null;
 
   // 他
   private scrollBuffer: number = 0;
@@ -71,7 +73,6 @@ export default class Yla {
 
     this.trigger = document.querySelectorAll<HTMLElement>(this.options.selectorTrigger);
 
-    // this.isInit = !!this.container && !!this.navi && !!this.content && this.trigger.length > 0;
     this.isInit = !!this.container && !!this.navi && this.trigger.length > 0;
 
     if (!this.isInit) {
