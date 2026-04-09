@@ -64,12 +64,14 @@ export interface ValikkoOptions extends Omit<ValikkoItemOptions, 'transition'> {
 export type YlaScrollThreshold = number | (() => number);
 
 export interface YlaOptions {
-  /** 開閉トリガー要素のセレクタ。省略時 '.yla-trigger' */
-  selectorTrigger?: string;
-  /** オーバーレイ要素のセレクタ。省略時 '.yla-overlay' */
-  selectorOverlay?: string;
-  /** 開閉対象のナビ要素のセレクタ。container 内で探し、無ければ container を使用。省略時 '.yla-navi' */
-  selectorNavi?: string;
+  /** 開閉トリガー（CSS セレクタ）。省略時 `.yla-trigger` */
+  trigger?: string;
+  /** オーバーレイ（CSS セレクタ）。省略時 `.yla-overlay` */
+  overlay?: string;
+  /** 開閉対象ナビ（CSS セレクタ）。`container` 内で検索し、無ければ `container` を使用。省略時 `.yla-navi` */
+  navi?: string;
+  /** スクロールロック対象のルート（CSS セレクタ）。省略時 `.yla-root` */
+  root?: string;
   /** この幅(px)以上でドロワー無効、未満で有効。min-width で判定（Valikko の breakpoints と同一基準）。null で常時有効。 */
   breakpoint?: number | null;
   /** 開閉時のトランジション種別 */
@@ -85,9 +87,7 @@ export interface YlaOptions {
     up?: YlaScrollThreshold;
     down?: YlaScrollThreshold;
   };
-  /**
-   * ドロワー表示中にスクロールを止める対象要素。`getBoundingClientRect` と `position: fixed` で固定する。
-   * `null` のときはロックしない。省略時は `document.body`。
-   */
-  scrollLockTarget?: HTMLElement | null;
+
+  /** スクロールロックを有効にするかどうか。省略時 true */
+  scrolllock?: boolean;
 }

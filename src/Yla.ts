@@ -32,6 +32,7 @@ export default class Yla {
   private mediaQuery: MediaQueryList | null = null;
 
   // スクロールロック時の保存値
+  private scrollLockTarget: HTMLElement | null = null;
   private isScrollLockActive: boolean = false;
   private savedWindowScrollY: number = 0;
   private savedElementScrollTop: number = 0;
@@ -46,15 +47,16 @@ export default class Yla {
 
   //オプション
   private optionsDefault: Required<YlaOptions> = {
-    selectorTrigger: '.yla-trigger',
-    selectorOverlay: '.yla-overlay',
-    selectorNavi: '.yla-navi',
+    trigger: '.yla-trigger',
+    overlay: '.yla-overlay',
+    navi: '.yla-navi',
+    root: '.yla-root',
     breakpoint: null,
 
     transition: 'fade',
     duration: 600,
     scroll: { over: 200, up: 0, down: 0 },
-    scrollLockTarget: document.body,
+    scrolllock: true,
   };
   private options: Required<YlaOptions>;
 
@@ -71,11 +73,15 @@ export default class Yla {
 
     this.container = container;
     this.container?.classList.add('yla-init');
-    this.navi = this.container?.querySelector<HTMLElement>(this.options.selectorNavi) ?? this.container ?? null;
-    this.overlay = document.querySelector<HTMLElement>(this.options.selectorOverlay);
+    this.navi = this.container?.querySelector<HTMLElement>(this.options.navi) ?? this.container ?? null;
+    this.overlay = document.querySelector<HTMLElement>(this.options.overlay);
     if (this.overlay) this.overlay.style.display = 'none';
 
-    this.trigger = document.querySelectorAll<HTMLElement>(this.options.selectorTrigger);
+    this.trigger = document.querySelectorAll<HTMLElement>(this.options.trigger);
+
+    const rootSel = this.options.root?.trim() ?? '';
+    const fromSelector = rootSel ? document.querySelector<HTMLElement>(rootSel) : null;
+    this.scrollLockTarget = fromSelector ?? document.body ?? document.documentElement;
 
     this.isInit = !!this.container && !!this.navi && this.trigger.length > 0;
 
@@ -277,11 +283,12 @@ export default class Yla {
         this.overlay!.style.display = 'none';
       });
     }
-    this.scrollUnlock();
+
     this.container!.dispatchEvent(new CustomEvent('yla:beforeClose'));
   }
 
   private onAfterClose() {
+    this.scrollUnlock();
     document.removeEventListener('keydown', this.handleFocusTrap);
     (document.activeElement as HTMLElement)?.blur();
     this.container!.dispatchEvent(new CustomEvent('yla:afterClose'));
@@ -299,11 +306,16 @@ export default class Yla {
 
   // ---------- ----------
   private scrollLock() {
-    const target = this.options.scrollLockTarget;
-    if (target == null) return;
+    if (!this.options.scrolllock) return;
+    if (this.isScrollLockActive) return;
+    if (this.scrollLockTarget == null) return;
+
+    const target = this.scrollLockTarget;
 
     this.savedWindowScrollY = window.scrollY;
     this.savedElementScrollTop = target.scrollTop;
+
+    const isDocRoot = target === document.body || target === document.documentElement;
 
     // 常時表示スクロールバーが消えたときの幅ジャンプを抑える（ロック前に幅を計測）
     const scrollbarWidth = Math.max(0, window.innerWidth - document.documentElement.clientWidth);
@@ -311,7 +323,6 @@ export default class Yla {
 
     const rect = target.getBoundingClientRect();
     const computed = getComputedStyle(target);
-    const isDocRoot = target === document.body || target === document.documentElement;
 
     target.style.position = 'fixed';
     target.style.top = `${rect.top}px`;
@@ -325,16 +336,20 @@ export default class Yla {
       target.style.left = '';
       target.style.height = '';
     }
-    target.style.overflow = 'hidden';
+
     target.classList.add('yla-scrolllocked');
+    // 先頭へ（閉じたときは保存した位置へ scrollUnlock で復元）
+    window.scrollTo({ top: 0, behavior: 'instant' });
 
     this.isScrollLockActive = true;
   }
 
   private scrollUnlock() {
-    const target = this.options.scrollLockTarget;
-    if (target == null || !this.isScrollLockActive) return;
-    this.isScrollLockActive = false;
+    if (!this.options.scrolllock) return;
+    if (!this.isScrollLockActive) return;
+    if (this.scrollLockTarget == null) return;
+
+    const target = this.scrollLockTarget;
 
     target.style.position = '';
     target.style.top = '';
@@ -346,6 +361,7 @@ export default class Yla {
 
     window.scrollTo({ top: this.savedWindowScrollY, behavior: 'instant' });
     target.scrollTop = this.savedElementScrollTop;
+    this.isScrollLockActive = false;
   }
 
   private focusTrap(event: KeyboardEvent) {
@@ -407,7 +423,7 @@ export default class Yla {
    * カスタムイベントのリスナーを登録する
    *
    * @param eventName - 次のいずれか（`container` にバブルする）
-   * - 開閉フェーズ: `yla:beforeOpen`（オーバーレイ表示・`scrollLock` 直後。対象は `scrollLockTarget`）, `yla:afterOpen`（フォーカストラップ登録直後）, `yla:beforeClose`（`scrollUnlock` 直後）, `yla:afterClose`（フォーカストラップ解除・`blur` 直後）
+   * - 開閉フェーズ: `yla:beforeOpen`（オーバーレイ表示・`scrollLock` 直後。ロック対象は `root` で解決した要素）, `yla:afterOpen`（フォーカストラップ登録直後）, `yla:beforeClose`（閉じる処理の開始時。まだスクロールロック中）, `yla:afterClose`（`scrollUnlock` 実行後・フォーカストラップ解除・`blur` 直後）
    * - 互換: `yla:open`（`yla:afterOpen` と同タイミング）, `yla:close`（`yla:afterClose` と同タイミング）
    * - その他: `yla:leave`, `yla:anchor`, `yla:changeMediaQuery`, `yla:scrolldown`, `yla:scrollup`
    * @param callback - 発火時に呼ばれる関数（`yla:anchor` のみ `click` の `MouseEvent` が渡る）
