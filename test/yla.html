@@ -40,70 +40,83 @@
       </div>
     </header>
 
-    <main class="main">
-      <div class="content">
-        <p class="main__back"><a href="/">← 一覧に戻る</a></p>
-        <h1>Yla テスト</h1>
-        <p>ブレークポイント 768px。PC は横並び追従ヘッダー、SP は全画面ハンバーガーメニューです。</p>
+    <div class="yla-root">
+      <main class="main">
+        <div class="content">
+          <p class="main__back"><a href="/">← 一覧に戻る</a></p>
+          <h1>Yla テスト</h1>
+          <p>ブレークポイント 768px。PC は横並び追従ヘッダー、SP は全画面ハンバーガーメニューです。</p>
 
-        <section class="main__options" id="yla-options">
-          <h2>オプション</h2>
-          <div class="options-panel">
-            <div class="options-panel__row">
-              <label class="options-panel__label">
-                breakpoint
-                <input type="number" name="breakpoint" class="options-panel__input" value="768" placeholder="空で常時有効" min="0" step="1" />
-              </label>
-              <span class="options-panel__hint">px 以下でドロワー有効。空で常時有効</span>
+          <section class="main__options" id="yla-options">
+            <h2>オプション</h2>
+            <div class="options-panel">
+              <div class="options-panel__row">
+                <label class="options-panel__label">
+                  breakpoint
+                  <input type="number" name="breakpoint" class="options-panel__input" value="768" placeholder="空で常時有効" min="0" step="1" />
+                </label>
+                <span class="options-panel__hint">px 以下でドロワー有効。空で常時有効</span>
+              </div>
+              <div class="options-panel__row">
+                <label class="options-panel__label">
+                  duration
+                  <input type="number" name="duration" class="options-panel__input" value="600" min="0" step="50" />
+                </label>
+                <span class="options-panel__hint">ms</span>
+              </div>
+              <div class="options-panel__row">
+                <label class="options-panel__label">
+                  scrolllock / root
+                  <select name="scrollLockMode" class="options-panel__select">
+                    <option value="root" selected>.yla-root（既定）</option>
+                    <option value="main">.main</option>
+                    <option value="none">scrolllock なし</option>
+                  </select>
+                </label>
+                <span class="options-panel__hint">`scrolllock` と `root` の組み合わせ</span>
+              </div>
+              <div class="options-panel__row">
+                <label class="options-panel__label">
+                  transition
+                  <select name="transition" class="options-panel__select">
+                    <option value="">なし</option>
+                    <option value="fade">fade</option>
+                    <option value="folding">folding</option>
+                    <option value="fadeFolding">fadeFolding</option>
+                    <option value="slideTop">slideTop</option>
+                    <option value="slideBottom">slideBottom</option>
+                    <option value="slideLeft">slideLeft</option>
+                    <option value="slideRight">slideRight</option>
+                  </select>
+                </label>
+              </div>
+              <div class="options-panel__row options-panel__row--scroll">
+                <span class="options-panel__label">scroll</span>
+                <label class="options-panel__inline"> over <input type="number" name="scrollOver" class="options-panel__input options-panel__input--narrow" value="200" min="0" /> </label>
+                <label class="options-panel__inline"> up <input type="number" name="scrollUp" class="options-panel__input options-panel__input--narrow" value="0" min="0" /> </label>
+                <label class="options-panel__inline"> down <input type="number" name="scrollDown" class="options-panel__input options-panel__input--narrow" value="0" min="0" /> </label>
+              </div>
+              <div class="options-panel__row">
+                <button type="button" class="options-panel__apply" id="yla-options-apply">適用</button>
+              </div>
             </div>
-            <div class="options-panel__row">
-              <label class="options-panel__label">
-                duration
-                <input type="number" name="duration" class="options-panel__input" value="600" min="0" step="50" />
-              </label>
-              <span class="options-panel__hint">ms</span>
-            </div>
-            <div class="options-panel__row">
-              <label class="options-panel__label">
-                transition
-                <select name="transition" class="options-panel__select">
-                  <option value="">なし</option>
-                  <option value="fade">fade</option>
-                  <option value="folding">folding</option>
-                  <option value="fadeFolding">fadeFolding</option>
-                  <option value="slideTop">slideTop</option>
-                  <option value="slideBottom">slideBottom</option>
-                  <option value="slideLeft">slideLeft</option>
-                  <option value="slideRight">slideRight</option>
-                </select>
-              </label>
-            </div>
-            <div class="options-panel__row options-panel__row--scroll">
-              <span class="options-panel__label">scroll</span>
-              <label class="options-panel__inline"> over <input type="number" name="scrollOver" class="options-panel__input options-panel__input--narrow" value="200" min="0" /> </label>
-              <label class="options-panel__inline"> up <input type="number" name="scrollUp" class="options-panel__input options-panel__input--narrow" value="0" min="0" /> </label>
-              <label class="options-panel__inline"> down <input type="number" name="scrollDown" class="options-panel__input options-panel__input--narrow" value="0" min="0" /> </label>
-            </div>
-            <div class="options-panel__row">
-              <button type="button" class="options-panel__apply" id="yla-options-apply">適用</button>
-            </div>
-          </div>
-        </section>
+          </section>
 
-        <section id="section-a" class="main__section">
-          <h2>セクションA</h2>
-          <p>アンカーリンクでここに飛び、ドロワーが閉じることを確認。</p>
-        </section>
-        <section id="section-b" class="main__section">
-          <h2>セクションB</h2>
-          <p>同上。</p>
-        </section>
-        <section id="section-c" class="main__section">
-          <h2>セクションC</h2>
-          <p>同上。</p>
-        </section>
-      </div>
-    </main>
+          <section id="section-a" class="main__section">
+            <h2>セクションA</h2>
+            <p>アンカーリンクでここに飛び、ドロワーが閉じることを確認。</p>
+          </section>
+          <section id="section-b" class="main__section">
+            <h2>セクションB</h2>
+            <p>同上。</p>
+          </section>
+          <section id="section-c" class="main__section">
+            <h2>セクションC</h2>
+            <p>同上。</p>
+          </section>
+        </div>
+      </main>
+    </div>
 
     <script type="module" src="/src/yla-test.ts"></script>
   </body>

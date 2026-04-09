@@ -22,13 +22,23 @@ function getOptionsFromForm(): YlaOptions {
   const scrollOver = Number(get('scrollOver')) || 0;
   const scrollUp = Number(get('scrollUp')) || 0;
   const scrollDown = Number(get('scrollDown')) || 0;
+  const scrollLockMode = get('scrollLockMode')?.trim() ?? 'root';
 
-  return {
+  const opts: YlaOptions = {
     breakpoint,
     duration,
     transition: transition || undefined,
     scroll: { over: scrollOver, up: scrollUp, down: scrollDown },
   };
+  if (scrollLockMode === 'none') {
+    opts.scrolllock = false;
+  } else if (scrollLockMode === 'main') {
+    opts.root = '.main';
+  } else {
+    // root: 既定どおり `.yla-root` をロック対象にする
+    opts.root = '.yla-root';
+  }
+  return opts;
 }
 
 function createYla(opts: YlaOptions): Yla {
