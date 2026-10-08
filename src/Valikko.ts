@@ -1,9 +1,6 @@
 import Disclosure from './Disclosure';
 // ドロップダウン
-import {
- DisclosureOptions, DisclosureTransitionType, ValikkoItemOptions, ValikkoOptions,
- ValikkoTransitionTopUnder
-} from './type';
+import { DisclosureOptions, DisclosureTransitionType, ValikkoItemOptions, ValikkoOptions, ValikkoTransitionTopUnder } from './type';
 
 const defaultValikkoOptions = {
   transition: 'folding' as DisclosureTransitionType,
@@ -178,6 +175,7 @@ export default class Valikko {
   /**
    * サブメニューをすべて開く
    * isCloseSiblingsの設定によっては最後のサブメニューだけ開く
+   * (SPに切り替えた時に全メニューを表示させておきたい時などに使う。isCloseSiblingsをfalseにすること)
    * @param transition - この回だけ使うトランジション（省略時はオプションの transition）
    */
   open(transition?: DisclosureTransitionType) {
