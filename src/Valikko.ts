@@ -176,6 +176,17 @@ export default class Valikko {
   }
 
   /**
+   * サブメニューをすべて開く
+   * isCloseSiblingsの設定によっては最後のサブメニューだけ開く
+   * @param transition - この回だけ使うトランジション（省略時はオプションの transition）
+   */
+  open(transition?: DisclosureTransitionType) {
+    this.menuItems.forEach((item) => {
+      if (item instanceof ValikkoItem) item.open(transition);
+    });
+  }
+
+  /**
    * 開いているサブメニューをすべて閉じる
    * @param transition - この回だけ使うトランジション（省略時はオプションの transition）
    */
