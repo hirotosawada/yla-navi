@@ -3,6 +3,9 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="stylesheet" href="/src/scss/common.scss" />
+    <link rel="stylesheet" href="../src/scss/yla.scss" />
+    <link rel="stylesheet" href="/src/scss/style.scss" />
     <title>Document</title>
   </head>
   <body>
@@ -11,8 +14,8 @@
         <div class="header__inner">
           <div class="header__logo">logo</div>
           <div class="header__nav">
-            <nav class="navi" id="navi" aria-label="メインナビゲーション（モバイル版）">
-              <div class="navi__content yla-content">
+            <nav class="navi yla-navi" id="navi" aria-label="メインナビゲーション（モバイル版）">
+              <div class="navi__content">
                 <div class="navi__head">
                   <button type="button" class="btn--navi--close navi__trigger yla-trigger">閉じる</button>
                 </div>
@@ -123,11 +126,12 @@
       <div class="navi__overlay yla-overlay"></div>
     </header>
 
-    <main>
-      <p><a href="/yla.html">Yla のテスト →</a></p>
-      <p><a href="/valikko.html">Valikko のテスト →</a></p>
+    <main class="main">
+      <div class="content">
+        <p><a href="/yla.html">Yla のテスト →</a></p>
+        <p><a href="/valikko.html">Valikko のテスト →</a></p>
 
-      <!-- <nav>
+        <!-- <nav>
         <ul class="valikko">
           <li class="valikko-item">
             <a class="valikko-trigger">メニュー１</a>
@@ -221,27 +225,14 @@
         </ul>
       </nav> -->
 
-      <div class="accordion">
-        <div class="accordion__trigger">開く</div>
-        <div class="accordion__body">Lorem ipsum dolor sit amet consectetur adipisicing elit. Illum vel quidem perspiciatis soluta quas excepturi obcaecati inventore repudiandae ipsa quae nesciunt mollitia numquam suscipit quod, provident, optio eum minima magni.</div>
-      </div>
-
-      <div class="tab">
-        <div class="tab__navi">
-          <button type="button" class="tab__navi__item">タブ1</button>
-          <button type="button" class="tab__navi__item">タブ2</button>
-          <button type="button" class="tab__navi__item">タブ3</button>
-          <button type="button" class="tab__navi__item">タブ4</button>
-        </div>
-        <div class="tab__body">
-          <div class="tab__body__item">タブ1の内容</div>
-          <div class="tab__body__item">タブ2の内容</div>
-          <div class="tab__body__item">タブ3の内容</div>
-          <div class="tab__body__item">タブ4の内容</div>
+        <h2>アコーディオンテスト</h2>
+        <div class="accordion">
+          <div class="accordion__trigger">開く</div>
+          <div class="accordion__body" aria-hidden="false">Lorem ipsum dolor sit amet consectetur adipisicing elit. Illum vel quidem perspiciatis soluta quas excepturi obcaecati inventore repudiandae ipsa quae nesciunt mollitia numquam suscipit quod, provident, optio eum minima magni.</div>
         </div>
       </div>
     </main>
 
-    <script type="module" src="/src/main.ts"></script>
+    <script type="module" src="/src/index.ts"></script>
   </body>
 </html>

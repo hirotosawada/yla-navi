@@ -1,0 +1,25 @@
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+}
+
+p {
+  margin: 0;
+}
+
+.content {
+  box-sizing: content-box;
+  max-width: 960px;
+  margin: 0 auto;
+  padding: 0 20px;
+}
+
+.content--l {
+  box-sizing: content-box;
+  max-width: 1440px;
+  margin: 0 auto;
+  padding: 0 20px;
+}

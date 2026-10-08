@@ -1,5 +1,3 @@
-import './scss/style.scss';
-
 import { Valikko } from '../../src/main.ts';
 
 document.addEventListener('DOMContentLoaded', () => {

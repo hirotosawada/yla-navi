@@ -86,12 +86,12 @@ export class FadeTransition extends Transition {
   }
 }
 
-/** 要素の scrollHeight に上下マージンを加えた高さを返す */
+/** 要素の offsetHeight に上下マージンを加えた高さを返す */
 function getHeightWithMargin(el: HTMLElement): number {
   const style = getComputedStyle(el);
   const marginTop = parseFloat(style.marginTop) || 0;
   const marginBottom = parseFloat(style.marginBottom) || 0;
-  return el.scrollHeight + marginTop + marginBottom;
+  return el.offsetHeight + marginTop + marginBottom;
 }
 
 export class FoldingTransition extends Transition {
@@ -99,39 +99,31 @@ export class FoldingTransition extends Transition {
   // keyFrameDefault = { open: { height: 'auto', opacity: 1 }, close: { height: '0px', opacity: 0 } };
 
   getKeyframesOpen(): Keyframe[] {
-    const currentStyle = getComputedStyle(this.content);
-    let keyframe: Keyframe = this.keyFrameDefault.close;
+    // const currentStyle = getComputedStyle(this.content);
+    const keyframeStart: Keyframe = this.keyFrameDefault.close;
 
     const firstChild = this.content.firstElementChild as HTMLElement;
     const heightInner = firstChild ? getHeightWithMargin(firstChild) : getHeightWithMargin(this.content);
-    const currentHeight = Math.ceil(parseFloat(currentStyle.height));
+    // const currentHeight = Math.ceil(parseFloat(currentStyle.height));
+    const keyframeEnd = { height: `${heightInner}px` };
 
-    if (currentHeight > 0 && currentHeight < heightInner) {
-      keyframe = { height: currentStyle.height };
-      // keyframe = { height: currentStyle.height, opacity: 0 };
-    }
-
-    return [keyframe, { height: `${heightInner}px` }];
-    // return [keyframe, { height: `${heightInner}px`, opacity: 1 }];
-    // return [];
+    // console.log(keyframeStart, keyframeEnd);
+    return [keyframeStart, keyframeEnd];
   }
 
   getKeyframesClose(): Keyframe[] {
-    const currentStyle = getComputedStyle(this.content);
-    let keyframe: Keyframe = this.keyFrameDefault.open;
+    // const currentStyle = getComputedStyle(this.content);
+    let keyframeStart: Keyframe = this.keyFrameDefault.open;
+    const keyframeEnd = this.keyFrameDefault.close;
 
-    // const firstChild = this.content.firstElementChild as HTMLElement;
-    // const heightInner = firstChild ? firstChild.scrollHeight : this.content.scrollHeight;
+    const firstChild = this.content.firstElementChild as HTMLElement;
+    const heightInner = firstChild ? getHeightWithMargin(firstChild) : getHeightWithMargin(this.content);
+    // const currentHeight = Math.ceil(parseFloat(currentStyle.height));
 
-    keyframe = { height: currentStyle.height };
-    // keyframe = { height: currentStyle.height, opacity: 1 };
-    // if (parseInt(currentStyle.height) > 0) {
-    // }
+    keyframeStart = { height: `${heightInner}px` };
 
-    // console.log(currentStyle.height);
-
-    return [keyframe, this.keyFrameDefault.close];
-    // return [];
+    // console.log(keyframeStart, keyframeEnd);
+    return [keyframeStart, keyframeEnd];
   }
 
   beforeOpen() {
@@ -139,10 +131,6 @@ export class FoldingTransition extends Transition {
   }
   afterOpen() {
     this.content.style.overflow = '';
-    // this.content.style.height = 'auto';
-
-    // this.content.style.opacity = '1';
-    // this.content.style.animation = 'none';
   }
 
   beforeClose() {
@@ -150,11 +138,9 @@ export class FoldingTransition extends Transition {
   }
   afterClose() {
     this.content.style.overflow = '';
-    // this.content.style.height = 'auto';
-
-    // this.content.style.opacity = '1';
   }
 }
+
 export class SlideTopTransition extends Transition {
   keyFrameDefault = { open: { transform: 'none' }, close: { transform: 'translateY(-100%)' } };
 
@@ -164,10 +150,8 @@ export class SlideTopTransition extends Transition {
 
     const translateY = this.decomposeMatrix(currentStyle.transform).translateY;
     if (translateY && translateY < 0) {
-      keyframe = { translateY: `${translateY}px` };
+      keyframe = { transform: `translateY(${translateY}px)` };
     }
-
-    // console.log(this.decomposeMatrix(currentStyle.transform));
 
     return [keyframe, this.keyFrameDefault.open];
   }
@@ -178,7 +162,7 @@ export class SlideTopTransition extends Transition {
 
     const translateY = this.decomposeMatrix(currentStyle.transform).translateY;
     if (translateY && translateY < 0) {
-      keyframe = { translateY: `${translateY}px` };
+      keyframe = { transform: `translateY(${translateY}px)` };
     }
 
     return [keyframe, this.keyFrameDefault.close];
@@ -193,7 +177,7 @@ export class SlideBottomTransition extends Transition {
 
     const translateY = this.decomposeMatrix(currentStyle.transform).translateY;
     if (translateY && translateY > 0) {
-      keyframe = { transform: `translatYX(${translateY}px)` };
+      keyframe = { transform: `translateY(${translateY}px)` };
     }
 
     return [keyframe, this.keyFrameDefault.open];
@@ -205,7 +189,7 @@ export class SlideBottomTransition extends Transition {
 
     const translateY = this.decomposeMatrix(currentStyle.transform).translateY;
     if (translateY && translateY > 0) {
-      keyframe = { transform: `translatYX(${translateY}px)` };
+      keyframe = { transform: `translateY(${translateY}px)` };
     }
 
     return [keyframe, this.keyFrameDefault.close];

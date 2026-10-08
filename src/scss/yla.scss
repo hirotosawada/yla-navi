@@ -1,0 +1,17 @@
+// ========== ========== ========== ========== ==========
+// core Yla
+// 初期化前は非表示
+.yla:not(.yla-init) {
+  display: none;
+}
+
+// オーバーレイ。固定配置で全画面を覆う
+.yla-overlay {
+  position: fixed;
+  inset: 0;
+}
+
+// スクロールロック時。補助として overflow を設定。設定は任意
+.yla-scrolllocked {
+  overflow: hidden;
+}

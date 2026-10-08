@@ -8,7 +8,7 @@ import { DisclosureTransitionType, YlaOptions } from './type';
 export default class Yla {
   // DOM
   private container: HTMLElement | null = null;
-  private content: HTMLElement | null = null;
+  private navi: HTMLElement | null = null;
   private overlay: HTMLElement | null = null;
   private trigger: NodeListOf<HTMLElement>;
   private anchors: NodeListOf<HTMLAnchorElement> = [] as unknown as NodeListOf<HTMLAnchorElement>;
@@ -24,12 +24,19 @@ export default class Yla {
   private handleKeydownEsc: (event: KeyboardEvent) => void = () => {};
   private handleChangeMediaQuery: (event: MediaQueryListEvent) => void = () => {};
   private handleOnScroll: () => void = () => {};
+  private handleOnLeaveContainer: (event: MouseEvent) => void = () => {};
 
   // ステータス
   private isInit: boolean = false;
   private isActive: boolean = false;
-  private currentScrollY: number = 0;
   private mediaQuery: MediaQueryList | null = null;
+
+  // スクロールロック時の保存値
+  private scrollLockTarget: HTMLElement | null = null;
+  private isScrollLockActive: boolean = false;
+  private savedWindowScrollY: number = 0;
+  private savedElementScrollTop: number = 0;
+  private savedWidth: string = '';
 
   // 他
   private scrollBuffer: number = 0;
@@ -40,14 +47,16 @@ export default class Yla {
 
   //オプション
   private optionsDefault: Required<YlaOptions> = {
-    selectorTrigger: '.yla-trigger',
-    selectorOverlay: '.yla-overlay',
-    selectorContent: '.yla-content',
+    trigger: '.yla-trigger',
+    overlay: '.yla-overlay',
+    navi: '.yla-navi',
+    root: '.yla-root',
     breakpoint: null,
 
     transition: 'fade',
     duration: 600,
     scroll: { over: 200, up: 0, down: 0 },
+    scrolllock: true,
   };
   private options: Required<YlaOptions>;
 
@@ -57,22 +66,30 @@ export default class Yla {
    */
   constructor(container: HTMLElement | null, options?: YlaOptions) {
     this.options = Object.assign({}, this.optionsDefault, options);
+    this.options.scroll = {
+      ...this.optionsDefault.scroll,
+      ...(options?.scroll ?? {}),
+    };
 
     this.container = container;
     this.container?.classList.add('yla-init');
-    this.overlay = document.querySelector<HTMLElement>(this.options.selectorOverlay);
+    this.navi = this.container?.querySelector<HTMLElement>(this.options.navi) ?? this.container ?? null;
+    this.overlay = document.querySelector<HTMLElement>(this.options.overlay);
     if (this.overlay) this.overlay.style.display = 'none';
 
-    this.content = document.querySelector<HTMLElement>(this.options.selectorContent);
-    this.trigger = document.querySelectorAll<HTMLElement>(this.options.selectorTrigger);
+    this.trigger = document.querySelectorAll<HTMLElement>(this.options.trigger);
 
-    this.isInit = !!this.container && !!this.content && this.trigger.length > 0;
+    const rootSel = this.options.root?.trim() ?? '';
+    const fromSelector = rootSel ? document.querySelector<HTMLElement>(rootSel) : null;
+    this.scrollLockTarget = fromSelector ?? document.body ?? document.documentElement;
+
+    this.isInit = !!this.container && !!this.navi && this.trigger.length > 0;
 
     if (!this.isInit) {
       throw new Error('Yla: Not found element');
     }
 
-    this.disclosure = new Disclosure(this.container, this.trigger, {
+    this.disclosure = new Disclosure(this.navi, this.trigger, {
       onBeforeOpen: this.onBeforeOpen.bind(this),
       onAfterOpen: this.onAfterOpen.bind(this),
       onBeforeClose: this.onBeforeClose.bind(this),
@@ -81,8 +98,8 @@ export default class Yla {
       duration: this.options.duration,
     });
 
-    this.anchors = this.container!.querySelectorAll<HTMLAnchorElement>('a[href^="#"]');
-    this.focusable = this.container!.querySelectorAll<HTMLElement>('a, button, input, textarea, select, [tabindex]:not([tabindex="-1"])');
+    this.anchors = this.navi!.querySelectorAll<HTMLAnchorElement>('a[href^="#"]');
+    this.focusable = this.navi!.querySelectorAll<HTMLElement>('a, button, input, textarea, select, [tabindex]:not([tabindex="-1"])');
 
     this.initializeEventHandlers();
     this.addEvents();
@@ -98,9 +115,11 @@ export default class Yla {
     this.handleChangeMediaQuery = this.changeMediaQuery.bind(this);
 
     this.handleOnScroll = this.onScroll.bind(this);
+    this.handleOnLeaveContainer = this.onLeaveContainer.bind(this);
   }
 
   private addEvents() {
+    this.container?.addEventListener('mouseleave', this.handleOnLeaveContainer);
     this.overlay?.addEventListener('click', this.handleClickOverlay);
     this.anchors.forEach((anchor) => {
       anchor.addEventListener('click', this.handleClickAnchor);
@@ -120,6 +139,7 @@ export default class Yla {
   }
 
   private removeEvents() {
+    this.container?.removeEventListener('mouseleave', this.handleOnLeaveContainer);
     this.overlay?.removeEventListener('click', this.handleClickOverlay);
     this.anchors.forEach((anchor) => {
       anchor.removeEventListener('click', this.handleClickAnchor);
@@ -142,6 +162,10 @@ export default class Yla {
 
       this.container!.dispatchEvent(new CustomEvent('yla:anchor', { detail: { event } }));
     }
+  }
+
+  private onLeaveContainer() {
+    this.container?.dispatchEvent(new CustomEvent('yla:leave'));
   }
 
   private keydownEsc(event: KeyboardEvent) {
@@ -169,6 +193,12 @@ export default class Yla {
     this.container!.dispatchEvent(new CustomEvent('yla:changeMediaQuery', { detail: { event } }));
   }
 
+  private getScrollThreshold(which: 'over' | 'up' | 'down'): number {
+    const fallbacks = { over: 200, up: 0, down: 0 } as const;
+    const raw = this.options.scroll[which] ?? fallbacks[which];
+    return typeof raw === 'function' ? raw() : raw;
+  }
+
   private onScroll() {
     if (!this.scrollTicking) {
       requestAnimationFrame(() => {
@@ -192,16 +222,16 @@ export default class Yla {
         this.scrollLast = currentScrollY;
 
         // スクロールのステータスをクラスに反映
-        document.documentElement.classList.toggle('yla-scrolled', currentScrollY > (this.options.scroll.over || 0));
+        document.documentElement.classList.toggle('yla-scrolled', currentScrollY > this.getScrollThreshold('over'));
         document.documentElement.classList.toggle('yla-scrolling-down', this.scrollBuffer > 0);
         document.documentElement.classList.toggle('yla-scrolling-up', this.scrollBuffer < 0);
 
         // イベント発火
         if (!this.scrollEventFired) {
-          if (this.scrollBuffer > (this.options.scroll.down || 0)) {
+          if (this.scrollBuffer > this.getScrollThreshold('down')) {
             this.container?.dispatchEvent(new CustomEvent('yla:scrolldown'));
             this.scrollEventFired = true;
-          } else if (this.scrollBuffer < -(this.options.scroll.up || 0)) {
+          } else if (this.scrollBuffer < -this.getScrollThreshold('up')) {
             this.container?.dispatchEvent(new CustomEvent('yla:scrollup'));
             this.scrollEventFired = true;
           }
@@ -227,7 +257,7 @@ export default class Yla {
     this.container!.classList.remove('yla-active');
     this.disclosure.setDisabled(true);
     this.disclosure.resetAnime();
-    // TODO: disclosureで、this.content.removeAttribute('aria-hidden'); しているが、メニューをsp、pcで使い回しているかどうかによって変わるかも。
+    // TODO: disclosure で開閉対象（navi）の aria-hidden を制御している。メニューを sp/pc で使い回す場合は要検討。
   }
 
   private onBeforeOpen() {
@@ -236,11 +266,13 @@ export default class Yla {
       this.overlay.animate(this.overlayAnime.fade, { duration: this.options.duration });
     }
     this.scrollLock();
+    this.container!.dispatchEvent(new CustomEvent('yla:beforeOpen'));
   }
 
   private onAfterOpen() {
     document.addEventListener('keydown', this.handleFocusTrap);
-    this.container!.dispatchEvent(new CustomEvent('yla:open'));
+    this.container!.dispatchEvent(new CustomEvent('yla:afterOpen'));
+    this.container!.dispatchEvent(new CustomEvent('yla:open')); // 互換性のために残す。いずれ削除する
   }
 
   private onBeforeClose() {
@@ -251,13 +283,16 @@ export default class Yla {
         this.overlay!.style.display = 'none';
       });
     }
-    this.scrollUnlock();
+
+    this.container!.dispatchEvent(new CustomEvent('yla:beforeClose'));
   }
 
   private onAfterClose() {
+    this.scrollUnlock();
     document.removeEventListener('keydown', this.handleFocusTrap);
     (document.activeElement as HTMLElement)?.blur();
-    this.container!.dispatchEvent(new CustomEvent('yla:close'));
+    this.container!.dispatchEvent(new CustomEvent('yla:afterClose'));
+    this.container!.dispatchEvent(new CustomEvent('yla:close')); // 互換性のために残す。いずれ削除する
   }
 
   // ---------- ----------
@@ -271,20 +306,62 @@ export default class Yla {
 
   // ---------- ----------
   private scrollLock() {
-    // スクロール位置固定
-    this.currentScrollY = window.scrollY;
-    document.body.style.width = getComputedStyle(document.body).width;
-    document.body.style.top = `-${this.currentScrollY}px`;
-    document.body.classList.add('yla-scrolllocked');
+    if (!this.options.scrolllock) return;
+    if (this.isScrollLockActive) return;
+    if (this.scrollLockTarget == null) return;
+
+    const target = this.scrollLockTarget;
+
+    this.savedWindowScrollY = window.scrollY;
+    this.savedElementScrollTop = target.scrollTop;
+
+    const isDocRoot = target === document.body || target === document.documentElement;
+
+    // 常時表示スクロールバーが消えたときの幅ジャンプを抑える（ロック前に幅を計測）
+    const scrollbarWidth = Math.max(0, window.innerWidth - document.documentElement.clientWidth);
+    this.savedWidth = target.style.width;
+
+    const rect = target.getBoundingClientRect();
+    const computed = getComputedStyle(target);
+
+    target.style.position = 'fixed';
+    target.style.top = `${rect.top}px`;
+    // スクロールバー非表示でレイアウト幅が広がる場合は、ロック直前の描画幅（px）に固定する
+    target.style.width = scrollbarWidth > 0 ? `${rect.width}px` : computed.width;
+
+    if (!isDocRoot) {
+      target.style.left = `${rect.left}px`;
+      target.style.height = `${rect.height}px`;
+    } else {
+      target.style.left = '';
+      target.style.height = '';
+    }
+
+    target.classList.add('yla-scrolllocked');
+    // 先頭へ（閉じたときは保存した位置へ scrollUnlock で復元）
+    window.scrollTo({ top: 0, behavior: 'instant' });
+
+    this.isScrollLockActive = true;
   }
 
   private scrollUnlock() {
-    // スクロール位置復元
-    document.body.style.top = '';
-    document.body.style.width = '';
-    document.body.classList.remove('yla-scrolllocked');
+    if (!this.options.scrolllock) return;
+    if (!this.isScrollLockActive) return;
+    if (this.scrollLockTarget == null) return;
 
-    window.scrollTo({ top: this.currentScrollY, behavior: 'instant' });
+    const target = this.scrollLockTarget;
+
+    target.style.position = '';
+    target.style.top = '';
+    target.style.left = '';
+    target.style.width = this.savedWidth;
+    target.style.height = '';
+    target.style.overflow = '';
+    target.classList.remove('yla-scrolllocked');
+
+    window.scrollTo({ top: this.savedWindowScrollY, behavior: 'instant' });
+    target.scrollTop = this.savedElementScrollTop;
+    this.isScrollLockActive = false;
   }
 
   private focusTrap(event: KeyboardEvent) {
@@ -344,8 +421,12 @@ export default class Yla {
 
   /**
    * カスタムイベントのリスナーを登録する
-   * @param eventName - 'yla:open' | 'yla:close' | 'yla:anchor' | 'yla:changeMediaQuery' など
-   * @param callback - 発火時に呼ばれる関数
+   *
+   * @param eventName - 次のいずれか（`container` にバブルする）
+   * - 開閉フェーズ: `yla:beforeOpen`（オーバーレイ表示・`scrollLock` 直後。ロック対象は `root` で解決した要素）, `yla:afterOpen`（フォーカストラップ登録直後）, `yla:beforeClose`（閉じる処理の開始時。まだスクロールロック中）, `yla:afterClose`（`scrollUnlock` 実行後・フォーカストラップ解除・`blur` 直後）
+   * - 互換: `yla:open`（`yla:afterOpen` と同タイミング）, `yla:close`（`yla:afterClose` と同タイミング）
+   * - その他: `yla:leave`, `yla:anchor`, `yla:changeMediaQuery`, `yla:scrolldown`, `yla:scrollup`
+   * @param callback - 発火時に呼ばれる関数（`yla:anchor` のみ `click` の `MouseEvent` が渡る）
    */
   on(eventName: string, callback: (event: Event) => void) {
     if (eventName === 'yla:anchor') {
@@ -373,7 +454,7 @@ export default class Yla {
       this.overlay.style.opacity = '';
     }
     this.container = null;
-    this.content = null;
+    this.navi = null;
     this.overlay = null;
     this.trigger = undefined as unknown as NodeListOf<HTMLElement>;
     this.anchors = undefined as unknown as NodeListOf<HTMLAnchorElement>;

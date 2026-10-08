@@ -1,14 +1,10 @@
-import './scss/style.scss';
-
 import Disclosure from '../../src/Disclosure.ts';
 import Yla, { Valikko } from '../../src/main.ts';
-
-// import Tab from '../../src/Tab.ts';
 
 document.addEventListener('DOMContentLoaded', function () {
   const breakpoint = 768;
 
-  const yla = new Yla(document.querySelector('.navi'), { transition: 'slideTop', breakpoint });
+  const yla = new Yla(document.querySelector('.header'), { transition: 'slideTop', breakpoint });
 
   document.querySelectorAll('.valikko-item').forEach((item) => {
     item.addEventListener('click', () => {});
@@ -38,11 +34,5 @@ document.addEventListener('DOMContentLoaded', function () {
 
   // ========== ========== ========== ========== ==========
 
-  // document.querySelector('.btn-close')?.addEventListener('click', () => {
-  //   valikko.close('none');
-  // });
-
   new Disclosure(document.querySelector('.accordion__body'), document.querySelector('.accordion__trigger'));
-
-  // new Tab(document.querySelector('.tab'));
 });

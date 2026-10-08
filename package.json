@@ -6,37 +6,52 @@
     "navigation",
     "javascript",
     "typescript",
+    "drawer",
+    "menu",
     "ドロワーメニュー"
   ],
-  "private": true,
-  "version": "1.0.0",
+  "version": "2.0.0",
   "author": "darowasahito",
   "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/HirotoSawada/yla-navi.git"
+  },
   "type": "module",
+  "sideEffects": [
+    "./dist/yla-bundle.esm.js",
+    "./dist/yla-bundle.min.js",
+    "**/*.css"
+  ],
   "files": [
     "dist",
     "src"
   ],
-  "main": "./dist/yla-bundle.min.js",
-  "module": "./dist/yla-bundle.js",
+  "main": "./dist/yla-bundle.esm.js",
+  "module": "./dist/yla-bundle.esm.js",
   "types": "./dist/yla-bundle.d.ts",
   "exports": {
     ".": {
       "types": "./dist/yla-bundle.d.ts",
-      "import": "./dist/yla-bundle.js",
-      "require": "./dist/yla-bundle.min.js"
+      "import": "./dist/yla-bundle.esm.js"
     },
     "./yla": {
-      "types": "./dist/yla-bundle.d.ts",
-      "require": "./dist/yla.min.js"
+      "types": "./dist/yla.d.ts",
+      "import": "./dist/yla.esm.js"
     },
     "./valikko": {
-      "types": "./dist/yla-bundle.d.ts",
-      "require": "./dist/valikko.min.js"
-    }
+      "types": "./dist/valikko.d.ts",
+      "import": "./dist/valikko.esm.js"
+    },
+    "./yla.css": "./dist/yla.css"
+  },
+  "publishConfig": {
+    "access": "public"
   },
   "scripts": {
-    "build": "tsc && vite build && vite build --config vite.config.yla.umd.js && vite build --config vite.config.valikko.umd.js",
+    "prepublishOnly": "npm run build",
+    "build": "tsc && vite build && vite build --config vite.config.yla.umd.js && vite build --config vite.config.valikko.umd.js && node scripts/bundle-dts.mjs && npm run build:css",
+    "build:css": "sass src/scss/yla.scss dist/yla.css --no-source-map",
     "preview": "vite preview",
     "test": "vite --config test/vite.config.js",
     "build:test": "tsc && vite build --config test/vite.config.js"
