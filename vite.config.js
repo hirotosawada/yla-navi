@@ -34,7 +34,7 @@ export default defineConfig({
       entry: resolve(__dirname, 'src/main.ts'),
       name: 'yla_navi',
       formats: ['es', 'umd'],
-      fileName: (format) => (format === 'umd' ? 'yla-bundle.min.js' : 'yla-bundle.js'),
+      fileName: (format) => (format === 'umd' ? 'yla-bundle.min.js' : 'yla-bundle.esm.js'),
     },
   },
 });
