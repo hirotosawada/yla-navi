@@ -33,10 +33,12 @@
     "./valikko": {
       "types": "./dist/yla-bundle.d.ts",
       "require": "./dist/valikko.min.js"
-    }
+    },
+    "./yla.css": "./dist/yla.css"
   },
   "scripts": {
-    "build": "tsc && vite build && vite build --config vite.config.yla.umd.js && vite build --config vite.config.valikko.umd.js",
+    "build": "tsc && vite build && vite build --config vite.config.yla.umd.js && vite build --config vite.config.valikko.umd.js && npm run build:css",
+    "build:css": "sass src/scss/yla.scss dist/yla.css --no-source-map",
     "preview": "vite preview",
     "test": "vite --config test/vite.config.js",
     "build:test": "tsc && vite build --config test/vite.config.js"

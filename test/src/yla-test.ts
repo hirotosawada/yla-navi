@@ -1,7 +1,3 @@
-import './scss/common.scss';
-import './scss/yla.scss';
-import './scss/yla-test.scss';
-
 import Yla from '../../src/main.ts';
 
 import type { YlaOptions, DisclosureTransitionType } from '../../src/type.ts';

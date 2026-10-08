@@ -1,7 +1,3 @@
-import './scss/common.scss';
-import './scss/yla.scss';
-import './scss/style.scss';
-
 import Disclosure from '../../src/Disclosure.ts';
 import Yla, { Valikko } from '../../src/main.ts';
 
