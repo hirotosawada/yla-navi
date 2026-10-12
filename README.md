@@ -63,4 +63,4 @@ import Valikko from '@darowasahito/yla-navi/valikko';
 
 単体は `dist/yla.min.js`（グローバル `Yla`）と `dist/valikko.min.js`（グローバル `Valikko`）です。
 
-マークアップとオプションは [ドキュメント](docs/README.md) を参照してください。
+マークアップとオプションは [ドキュメント](https://hirotosawada.github.io/yla-navi/) を参照してください。
