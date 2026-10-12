@@ -16,90 +16,69 @@ $bp-menu: 768px;
   }
 }
 
-@media screen and (width <= $bp-menu) {
-  .valikko {
-    background: #f0f0f0;
+.valikko {
+  background: #f0f0f0;
 
-    &,
-    ul {
-      margin: 0;
-      padding: 0;
+  &,
+  ul {
+    margin: 0;
+    padding: 0;
 
-      list-style: none;
+    list-style: none;
+  }
+
+  *[aria-expanded] {
+    &::after {
+      content: "＞";
     }
+  }
 
-    *[aria-expanded] {
-      &::after {
-        content: "＞";
-      }
+  &-item {
+    position: relative;
+  }
+
+  &-trigger {
+    display: block;
+    padding: 0.5rem 1rem;
+
+    white-space: nowrap;
+    word-break: keep-all;
+
+    &[aria-expanded="true"] {
+      background: #eee;
     }
+  }
 
-    &-item {
-      position: relative;
-    }
+  &-child {
+    top: 0;
+    left: 100%;
 
-    &-trigger {
-      display: block;
-      padding: 0.5rem 1rem;
+    padding-left: 1rem;
 
-      white-space: nowrap;
-      word-break: keep-all;
+    overflow: hidden;
 
-      &[aria-expanded="true"] {
-        background: #eee;
-      }
-    }
-
-    &-child {
-      top: 0;
-      left: 100%;
-
-      padding-left: 1rem;
-
-      overflow: hidden;
-
-      background: #fff;
-    }
+    background: #fff;
   }
 }
 
-@media screen and (width > $bp-menu) {
+@media screen and (width >= $bp-menu) {
   .valikko {
     display: flex;
     width: fit-content;
 
-    background: #f0f0f0;
-
-    &,
-    ul {
-      margin: 0;
-      padding: 0;
-
-      list-style: none;
-    }
-
-    *[aria-expanded] {
-      &::after {
-        content: "＞";
-      }
-    }
-
-    &-trigger {
-      display: block;
-      padding: 0.5rem 1rem;
-
-      white-space: nowrap;
-      word-break: keep-all;
-
-      &[aria-expanded="true"] {
-        background: #eee;
-      }
+    &-item {
+      position: static;
     }
 
     &-child {
       position: absolute;
+      top: auto;
+      left: auto;
 
-      background: #fff;
+      padding-left: 0;
+
+      overflow: visible;
+
       box-shadow: 3px 3px 10px rgb(0 0 0/20%);
     }
 

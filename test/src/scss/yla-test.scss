@@ -1,6 +1,6 @@
 // ========== ========== ========== ========== ==========
 // Yla テストページ専用（page-yla）
-// PC: 横並び追従ヘッダー / SP: 全画面ハンバーガーメニュー
+// 基準は全画面ハンバーガー。768px 以上で横並びヘッダー
 // ========== ========== ========== ========== ==========
 
 $bp: 768px;
@@ -42,14 +42,15 @@ $header-height: 56px;
     }
   }
 
-  // SP: ハンバーガーボタン
+  // 狭い幅では表示。768px 以上では隠す
   &__nav-trigger {
     position: relative;
     z-index: 99;
 
-    display: none;
-    @media (width <= $bp) {
-      display: block;
+    display: block;
+
+    @media (width >= $bp) {
+      display: none;
     }
   }
 
@@ -105,91 +106,98 @@ $header-height: 56px;
   }
 
   // ========== ========== ========== ========== ==========
-  // SP: ドロワー
-  @media (width <= $bp) {
-    .header__nav {
-      position: absolute;
-      top: 0;
-      left: 0;
+  // 基準: ドロワー
+  .header__nav {
+    position: absolute;
+    top: 0;
+    left: 0;
 
-      z-index: 20;
+    z-index: 20;
 
-      width: 100%;
+    width: 100%;
+  }
+
+  .navi {
+    // max-height: 100dvh;
+    // overflow: auto;
+
+    background: #fff;
+
+    &__content {
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      min-height: 100dvh;
+      padding: 2rem 1.5rem 3rem;
     }
 
-    .navi {
-      // max-height: 100dvh;
-      // overflow: auto;
+    &__body {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
 
-      background: #fff;
+    &__menu {
+      width: 100%;
+      max-width: 20rem;
+      margin: 0 auto;
+      padding: 0;
 
-      &__content {
-        display: flex;
-        flex-direction: column;
-        justify-content: center;
-        min-height: 100dvh;
-        padding: 2rem 1.5rem 3rem;
-      }
+      text-align: center;
 
-      &__body {
-        display: flex;
-        align-items: center;
-        justify-content: center;
-      }
+      list-style: none;
 
-      &__menu {
-        width: 100%;
-        max-width: 20rem;
-        margin: 0 auto;
-        padding: 0;
+      a {
+        display: block;
+        padding: 1rem;
 
-        text-align: center;
-
-        list-style: none;
-
-        a {
-          display: block;
-          padding: 1rem;
-
-          color: #111;
-          font-size: 1.125rem;
-          text-decoration: none;
-
-          border-bottom: 1px solid #eee;
-
-          &:hover {
-            background: #f8f8f8;
-          }
-        }
-      }
-
-      &__foot {
-        padding-top: 1.5rem;
-
-        text-align: center;
-      }
-
-      &__contact {
-        display: inline-block;
-        padding: 0.75rem 1.5rem;
-
-        color: #fff;
-        font-size: 0.9375rem;
+        color: #111;
+        font-size: 1.125rem;
         text-decoration: none;
 
-        background: #111;
-        border-radius: 4px;
+        border-bottom: 1px solid #eee;
 
         &:hover {
-          background: #333;
+          background: #f8f8f8;
         }
+      }
+    }
+
+    &__foot {
+      padding-top: 1.5rem;
+
+      text-align: center;
+    }
+
+    &__contact {
+      display: inline-block;
+      padding: 0.75rem 1.5rem;
+
+      color: #fff;
+      font-size: 0.9375rem;
+      text-decoration: none;
+
+      background: #111;
+      border-radius: 4px;
+
+      &:hover {
+        background: #333;
       }
     }
   }
 
   // ========== ========== ========== ========== ==========
-  // PC: .navi__content をヘッダー内で横並び
-  @media (width > $bp) {
+  // 768px 以上: .navi__content をヘッダー内で横並び
+  @media (width >= $bp) {
+    .header__nav {
+      position: static;
+      top: auto;
+      left: auto;
+      z-index: auto;
+
+      width: auto;
+    }
+
     .navi {
       position: static;
 
@@ -219,6 +227,7 @@ $header-height: 56px;
     }
 
     .navi__body {
+      display: block;
       flex: none;
       padding: 0;
     }
@@ -243,8 +252,11 @@ $header-height: 56px;
         font-size: 0.9375rem;
         text-decoration: none;
 
+        border-bottom: none;
+
         &:hover {
           color: #000;
+          background: transparent;
         }
       }
     }

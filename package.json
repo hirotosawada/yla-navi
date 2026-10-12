@@ -4,18 +4,16 @@
   "displayName": "Ylä",
   "keywords": [
     "navigation",
-    "javascript",
-    "typescript",
     "drawer",
     "menu",
-    "ドロワーメニュー"
+    "dropdown"
   ],
   "version": "2.0.0",
   "author": "darowasahito",
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/HirotoSawada/yla-navi.git"
+    "url": "git+https://github.com/hirotosawada/yla-navi.git"
   },
   "type": "module",
   "sideEffects": [
@@ -53,10 +51,12 @@
     "build": "tsc && vite build && vite build --config vite.config.yla.umd.js && vite build --config vite.config.valikko.umd.js && node scripts/bundle-dts.mjs && npm run build:css",
     "build:css": "sass src/scss/yla.scss dist/yla.css --no-source-map",
     "preview": "vite preview",
+    "docs": "docsify serve docs",
     "test": "vite --config test/vite.config.js",
     "build:test": "tsc && vite build --config test/vite.config.js"
   },
   "devDependencies": {
+    "docsify-cli": "^5.0.0",
     "sass": "^1.81.0",
     "typescript": "~5.6.2",
     "vite": "^6.0.5",

@@ -20,11 +20,14 @@ function serveLibraryStylesheet() {
   };
 }
 
-export default defineConfig({
+export default defineConfig(({ command }) => ({
   root: 'test',
+  // 開発サーバーは / 。ビルドは docs/demo に置くので、Pages のリポジトリパスでも解決する相対 base。
+  base: command === 'build' ? './' : '/',
   plugins: [serveLibraryStylesheet()],
   build: {
-    outDir: '../demo',
+    outDir: '../docs/demo',
+    emptyOutDir: true,
     rollupOptions: {
       input: {
         index: resolve(__dirname, 'index.html'),
@@ -33,4 +36,4 @@ export default defineConfig({
       },
     },
   },
-});
+}));

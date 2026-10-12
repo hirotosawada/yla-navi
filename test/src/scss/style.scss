@@ -24,15 +24,18 @@ body {
     display: flex;
   }
 
-  @media screen and (width <= $bp-menu) {
+  .nav--header {
+    display: none;
+  }
+
+  @media screen and (width >= $bp-menu) {
     .nav--header {
-      display: none;
+      display: revert;
     }
   }
 }
 
-@media screen and (width <= $bp-menu) {
-  .navi {
+.navi {
     position: fixed;
     top: 0;
 
@@ -99,9 +102,34 @@ body {
       }
     }
   }
-}
 
-@media screen and (width > $bp-menu) {
+@media screen and (width >= $bp-menu) {
+  .navi {
+    position: static;
+    top: auto;
+    right: auto;
+    bottom: auto;
+    z-index: auto;
+
+    width: auto;
+    max-width: none;
+    height: auto;
+
+    padding-left: 0;
+
+    border: none;
+
+    &__content {
+      position: static;
+      height: auto;
+      padding: 0;
+
+      > * + * {
+        padding-top: 0;
+      }
+    }
+  }
+
   .nav--navi {
     display: flex;
     gap: 0.5em;
@@ -109,6 +137,10 @@ body {
     margin: 0;
 
     list-style: none;
+
+    &__item a {
+      padding: 0;
+    }
   }
 
   .navi__head,
@@ -131,104 +163,70 @@ body {
 }
 
 .valikko {
+  background: #f0f0f0;
+
+  &,
+  ul {
+    margin: 0;
+    padding: 0;
+
+    list-style: none;
+  }
+
+  *[aria-expanded] {
+    &::after {
+      content: "＞";
+    }
+  }
+
+  &-item {
+    position: relative;
+  }
+
+  &-trigger {
+    display: block;
+    padding: 0.5rem 1rem;
+
+    white-space: nowrap;
+    word-break: keep-all;
+
+    &[aria-expanded="true"] {
+      background: #eee;
+    }
+  }
+
   &-child {
-    // overflow: hidden;
+    // position: absolute;
+    top: 0;
+    left: 100%;
+
+    padding-left: 1rem;
+
+    overflow: hidden;
+
+    background: #fff;
   }
 }
 
-@media screen and (width <= $bp-menu) {
-  .valikko {
-    background: #f0f0f0;
-
-    &,
-    ul {
-      margin: 0;
-      padding: 0;
-
-      list-style: none;
-    }
-
-    *[aria-expanded] {
-      &::after {
-        content: "＞";
-      }
-    }
-
-    &-item {
-      position: relative;
-    }
-
-    &-trigger {
-      display: block;
-      padding: 0.5rem 1rem;
-
-      white-space: nowrap;
-      word-break: keep-all;
-
-      &[aria-expanded="true"] {
-        background: #eee;
-      }
-    }
-
-    &-child {
-      // position: absolute;
-      top: 0;
-      left: 100%;
-
-      padding-left: 1rem;
-
-      overflow: hidden;
-
-      background: #fff;
-    }
-  }
-}
-
-@media screen and (width > $bp-menu) {
+@media screen and (width >= $bp-menu) {
   // メニューバー
   .valikko {
     display: flex;
     width: fit-content;
 
-    background: #f0f0f0;
-
-    &,
-    ul {
-      margin: 0;
-      padding: 0;
-
-      list-style: none;
-    }
-
-    *[aria-expanded] {
-      &::after {
-        content: "＞";
-      }
-    }
-
     &-item {
-      // position: relative;
-    }
-
-    &-trigger {
-      display: block;
-      padding: 0.5rem 1rem;
-
-      white-space: nowrap;
-      word-break: keep-all;
-
-      &[aria-expanded="true"] {
-        background: #eee;
-      }
+      position: static;
     }
 
     &-child {
       position: absolute;
+      top: auto;
+      left: auto;
 
-      // top: 0;
-      // left: 100%;
+      padding-left: 0;
 
-      background: #fff;
+      overflow: visible;
+
       box-shadow: 3px 3px 10px rgb(0 0 0/20%);
     }
 
