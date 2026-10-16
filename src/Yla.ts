@@ -324,10 +324,10 @@ export default class Yla {
     const rect = target.getBoundingClientRect();
     const computed = getComputedStyle(target);
 
-    target.style.position = 'fixed';
     target.style.top = `${rect.top}px`;
     // スクロールバー非表示でレイアウト幅が広がる場合は、ロック直前の描画幅（px）に固定する
     target.style.width = scrollbarWidth > 0 ? `${rect.width}px` : computed.width;
+    target.style.position = 'fixed';
 
     if (!isDocRoot) {
       target.style.left = `${rect.left}px`;
